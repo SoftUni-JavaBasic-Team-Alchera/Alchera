@@ -1,6 +1,9 @@
 package com.alchera.game;
 
 import static com.alchera.game.Structure.Utils.Variables.*;
+
+import com.alchera.game.Structure.Entities.Player;
+import com.alchera.game.Structure.Listeners.ContactHandler;
 import com.alchera.game.Structure.Utils.BodyFactory;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -24,16 +27,19 @@ public class Alchera extends ApplicationAdapter {
 
 	SpriteBatch batch;
 	Sprite img;
+	ContactHandler contactHandler;
 	OrthographicCamera camera;
 	OrthographicCamera b2dCamera;
 	Box2DDebugRenderer boxRenderer;
-	Body playerBody;
+	Player player;
 	Body floor;
 	World boxWorld;
 
 
 	@Override
 	public void create () {
+
+
 		// Set the default background color.
 		Gdx.gl.glClearColor(0, 0, 0f, 1);
 
@@ -45,8 +51,12 @@ public class Alchera extends ApplicationAdapter {
 		b2dCamera.setToOrtho(false, WIDTH / PPM, HEIGHT / PPM);
 
 		// Create a box2d world to simulate all physics
-		boxWorld = new World(new Vector2(0, -10), true);
+		boxWorld = new World(new Vector2(0, -18), true);
 
+		player = new Player(boxWorld);
+		contactHandler = new ContactHandler(player);
+
+		boxWorld.setContactListener(contactHandler);
 		// Debug renderer to see a representation of what happens in the Box2D world.
 		boxRenderer = new Box2DDebugRenderer();
 		batch = new SpriteBatch();
@@ -55,8 +65,6 @@ public class Alchera extends ApplicationAdapter {
 		// Create a image to use for the player.
 		img = new Sprite(new Texture("badlogic.jpg"));
 
-		// Create a "Player" box2d object in our box2d world. Uses Pixels per meter conversion internally. Fixed rotation
-		playerBody = BodyFactory.CreateDynamicRectangle(boxWorld, img.getWidth(), img.getHeight(), 400, 400, 0.1f, 0);
 		// Create a floor to simulate ground. Uses Pixels per meter conversion internally.
 		floor = BodyFactory.CreateStaticRectangle(boxWorld, WIDTH, 10, 0, 0, 1, 1);
 	}
@@ -71,7 +79,7 @@ public class Alchera extends ApplicationAdapter {
 		// Draw begins here.
 		batch.begin();
 		// Draw the player getting the position from the Box2D world and converting it back to pixel position.
-		batch.draw(img,playerBody.getPosition().x * PPM,playerBody.getPosition().y * PPM);
+		player.render(batch);
 		// Draw ends here.
 		batch.end();
 
@@ -82,7 +90,8 @@ public class Alchera extends ApplicationAdapter {
 
 	private void update() {
 		// Move box2d world physics.
-		boxWorld.step(Gdx.graphics.getDeltaTime(), 6, 2);
+		boxWorld.step(Gdx.graphics.getDeltaTime(), 8, 2);
+		player.update(Gdx.graphics.getDeltaTime());
 		// Handle input
 		input();
 	}
@@ -90,26 +99,6 @@ public class Alchera extends ApplicationAdapter {
 
 	private void input(){
 		// Get reference to the current velocity of the player
-		Vector2 velocity = playerBody.getLinearVelocity();
 
-		// Handle movement to the left and right else stop slowly.
-		if (Gdx.input.isKeyPressed(Keys.A)){
-			if (velocity.x > 0)
-				playerBody.setLinearVelocity(MathUtils.lerp(velocity.x,0,0.1f),velocity.y);
-
-			playerBody.applyForceToCenter(-1,0,true);
-		}else if (Gdx.input.isKeyPressed(Keys.D)){
-			if (velocity.x < 0)
-				playerBody.setLinearVelocity(MathUtils.lerp(velocity.x,0,0.1f),velocity.y);
-
-			playerBody.applyForceToCenter(1,0,true);
-		}else {
-			playerBody.setLinearVelocity(MathUtils.lerp(velocity.x,0,0.1f),velocity.y);
-		}
-
-		// Jump handle, infinite jumping possible atm.
-		if (Gdx.input.isKeyJustPressed(Keys.SPACE)){
-			playerBody.applyForceToCenter(0,100,true);
-		}
 	}
 }
