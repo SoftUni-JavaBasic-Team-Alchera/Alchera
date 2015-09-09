@@ -14,7 +14,7 @@ import static com.alchera.game.Structure.Utils.Variables.*;
 
 public class Player implements Disposable{
 
-    private final float accelerationSpeed = 10f; // Does not mean it instantly goes to 10f, it does it gradually
+    private final float accelerationSpeed = 20f; // Does not mean it instantly goes to 10f, it does it gradually
     private final float maxSpeed = 4f;
     private final float jumpForce = 20f;
 
@@ -45,7 +45,7 @@ public class Player implements Disposable{
 
         FixtureDef fdef = new FixtureDef();
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox((region.getRegionWidth()/2)/PPM,2 / PPM, new Vector2((region.getRegionWidth()/2)/PPM,0),0);
+        shape.setAsBox(((region.getRegionWidth()-5)/2)/PPM,2 / PPM, new Vector2((region.getRegionWidth()/2)/PPM,0),0);
         fdef.shape = shape;
         fdef.isSensor = true;
 
@@ -69,36 +69,22 @@ public class Player implements Disposable{
 
         if (isIdle)
         {
-            batch.draw(idle, body.getPosition().x * PPM, body.getPosition().y * PPM);
+            batch.draw(idle, body.getPosition().x * PPM, body.getPosition().y * PPM,idle.getOriginX(),idle.getOriginY(),idle.getRegionWidth(),idle.getRegionHeight(), isFlipped ? -1 : 1,1,0);
         }
         else{
-            batch.draw(currentAnimation.getKeyFrame(elapsedTime),body.getPosition().x * PPM,body.getPosition().y * PPM);
+            TextureRegion currentFrame = currentAnimation.getKeyFrame(elapsedTime);
+            batch.draw(currentFrame,body.getPosition().x * PPM,body.getPosition().y * PPM,currentFrame.getRegionWidth()/2,0f,currentFrame.getRegionWidth(),currentFrame.getRegionHeight(),isFlipped ? -1f:1f,1f,0);
         }
     }
 
     public void update(float delta) {
         Vector2 velocity = body.getLinearVelocity();
 
-        // Flip idle sprite
-        if (isFlipped && !idle.isFlipX()) {
-            idle.flip(true, false);
-        } else if (!isFlipped && idle.isFlipX()) {
-            idle.flip(true, false);
-
-        }
-
-        // Handle jumping with flipping of the animation. Can jump only if theres a contact with the groundTrigger.
-        if (Gdx.input.isKeyPressed(Keys.SPACE) && !isAttacking) {
-            if (isGrounded)
-                body.applyForceToCenter(0, jumpForce, true);
+        // Handle jumping with flipping of the animation. Can jump only if there's a contact with the groundTrigger.
+        if (Gdx.input.isKeyJustPressed(Keys.SPACE) && isGrounded) {
+            body.applyForceToCenter(0, jumpForce, true);
             isGrounded = false;
-            if (currentAnimation != jump) {
-
-                if (isFlipped && !jump.getKeyFrame(delta).isFlipX()) {
-                    AssetUtils.flipAnimation(jump, true, false);
-                } else if (!isFlipped && jump.getKeyFrame(delta).isFlipX()) {
-                    AssetUtils.flipAnimation(jump, true, false);
-                }
+            if (currentAnimation != jump && !isAttacking) {
                 currentAnimation = jump;
                 elapsedTime = 0;
             }
@@ -108,17 +94,11 @@ public class Player implements Disposable{
         // Handle punching with flipping of the animation. Can't do anything while punching animation is going.
         if (Gdx.input.isKeyJustPressed(Keys.E)) {
             if (currentAnimation != punch) {
-                if (isFlipped && !punch.getKeyFrame(delta).isFlipX()) {
-                    AssetUtils.flipAnimation(punch, true, false);
-                } else if (!isFlipped && punch.getKeyFrame(delta).isFlipX()) {
-                    AssetUtils.flipAnimation(punch, true, false);
-                }
                 currentAnimation = punch;
                 elapsedTime = 0;
                 isIdle = false;
                 isAttacking = true;
             }
-
         }
 
         // Check if the punching animation is finished, to reset the trigger.
@@ -126,21 +106,13 @@ public class Player implements Disposable{
             isAttacking = false;
         }
 
-        // If the player is in the air, skip all other logic. Cant move in the air atm.
-        if (!isGrounded)
-            return;
-
-
         // Move left if not attacking. Interpolates movement speed if moving in the opposite direction to change direction fast.
         // Handles if the animation should be flipped.
         if (Gdx.input.isKeyPressed(Keys.A) && !isAttacking) {
             if (velocity.x > 0)
-                body.setLinearVelocity(MathUtils.lerp(velocity.x, 0, 0.1f), velocity.y);
-            if (!isFlipped) {
-                AssetUtils.flipAnimation(run, true, false);
-                isFlipped = true;
-            }
-            if (currentAnimation != run) {
+                body.setLinearVelocity(MathUtils.lerp(velocity.x, 0, 0.3f), velocity.y);
+            isFlipped = true;
+            if (currentAnimation != run && isGrounded) {
                 currentAnimation = run;
                 elapsedTime = 0;
             }
@@ -151,14 +123,12 @@ public class Player implements Disposable{
         }
         // Move left if not attacking. Interpolates movement speed if moving in the opposite direction to change direction fast.
         // Handles if the animation should be flipped.
-        else if (Gdx.input.isKeyPressed(Keys.D) && !isAttacking) {
+        else if (Gdx.input.isKeyPressed(Keys.D)&& !isAttacking) {
             if (velocity.x < 0)
-                body.setLinearVelocity(MathUtils.lerp(velocity.x, 0, 0.1f), velocity.y);
-            if (isFlipped) {
-                AssetUtils.flipAnimation(run, true, false);
-                isFlipped = false;
-            }
-            if (currentAnimation != run) {
+                body.setLinearVelocity(MathUtils.lerp(velocity.x, 0, 0.3f), velocity.y);
+            isFlipped = false;
+
+            if (currentAnimation != run && isGrounded) {
                 currentAnimation = run;
                 elapsedTime = 0;
             }
@@ -168,12 +138,13 @@ public class Player implements Disposable{
         }
         // If neither A or D is pressed, slowly stop the character, and reset values.
         else {
-            body.setLinearVelocity(MathUtils.lerp(velocity.x, 0, 0.2f), velocity.y);
-
+            if(isGrounded)
+                body.setLinearVelocity(MathUtils.lerp(velocity.x, 0, 0.3f), velocity.y);
+            else
+                body.setLinearVelocity(MathUtils.lerp(velocity.x, 0, 0.1f), velocity.y);
             if (!isAttacking && isGrounded && velocity.x < 0.3) {
                 elapsedTime = 0;
                 isIdle = true;
-                currentAnimation = null;
             }
         }
     }
@@ -192,6 +163,26 @@ public class Player implements Disposable{
 
     public void setGrounded(boolean grounded){
         this.isGrounded = grounded;
+    }
+
+    public float getWorldX(){
+        return this.body.getPosition().x * PPM;
+    }
+
+    public float getWorldY(){
+        return this.body.getPosition().y * PPM;
+    }
+
+    public float getBoxWorldX(){
+        return this.body.getPosition().x;
+    }
+
+    public float getBoxWorldY(){
+        return this.body.getPosition().y;
+    }
+
+    public Vector2 getBoxWorldPosition(){
+        return this.body.getPosition();
     }
 
     @Override

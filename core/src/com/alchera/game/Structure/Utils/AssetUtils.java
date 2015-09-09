@@ -6,9 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 
-/**
- * Created by Inspix on 09/09/2015.
- */
+
 public class AssetUtils {
 
     public static Animation createFromAtlas(TextureAtlas atlas,String name, int count){
