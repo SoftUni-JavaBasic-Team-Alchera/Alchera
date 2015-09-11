@@ -1,5 +1,6 @@
 package com.alchera.game.Structure.Entities.Enemys;
 
+import com.alchera.game.Structure.Entities.Player;
 import com.alchera.game.Structure.Utils.AssetUtils;
 import com.alchera.game.Structure.Utils.BodyFactory;
 import com.badlogic.gdx.Gdx;
@@ -12,59 +13,97 @@ import com.badlogic.gdx.physics.box2d.*;
 import static com.alchera.game.Structure.Utils.Variables.PPM;
 
 /**
- * Created by Administrator on 9/11/2015.
+ * Created by Nedyalkov on 9/11/2015.
  */
-public class Enemy {
-    private final float accelerationSpeed = 20f;
+public class Enemy{
+    //Chase speed
+    private final float accelerationSpeed = 10f;
+    private final float maxSpeed = 2f;
 
+    //body in box2d world
     private Body body;
     private float elapsedTime;
     private boolean isFlipped;
-    private String direction;
 
+    //Enemy states and triggers
     private EnemyState enemyState;
-
     private Fixture chasingTrigger;
     private Fixture attackTrigger;
-
     private boolean isIdle;
 
+    //Sprites and animations
     private Sprite idle;
     private TextureAtlas atlas;
     private Animation move;
     private Animation attack;
-
     private Animation currentAnimation;
 
-    public Enemy(World world) {
-        atlas = new TextureAtlas(Gdx.files.internal("sprites/enemy.txt"));
-        TextureAtlas.AtlasRegion region = atlas.findRegion("move0");
-        body = BodyFactory.CreateDynamicRectangle(world, region.getRegionWidth(), region.getRegionHeight(), 500, 0, 0.5f, 0);
+    //Instance of main player
+    private Player player;
+
+    public Enemy(World world, Player player, String spritesPath, int locationX, int locationY, String startSpriteRegion,
+                 String moveAnimation, int moveAnimationNumberOfFrames, String attackAnimation, int attackAnimationNumberOfFrames) {
+
+        atlas = new TextureAtlas(Gdx.files.internal(spritesPath));
+        TextureAtlas.AtlasRegion region = atlas.findRegion(startSpriteRegion);
+        body = BodyFactory.CreateDynamicRectangle(world, region.getRegionWidth(), region.getRegionHeight(), locationX, locationY, 0.5f, 0);
         body.setUserData(this);
         isIdle = true;
         isFlipped = false;
-        idle = atlas.createSprite("move0");
-        move = AssetUtils.createFromAtlas(atlas, "move", 4, 1);
+        idle = atlas.createSprite(startSpriteRegion);
+
+        //create animations
+        createAnimations(moveAnimation,moveAnimationNumberOfFrames,attackAnimation,attackAnimationNumberOfFrames);
+
+        //Trigegers set
+        setChasing(region);
+        setAttackTrigger(region);
+
+        //Get instance of player
+        this.player = player;
+
+    }
+
+    private void createAnimations(String moveAnimation, int moveAnimationNumberOfFrames,String attackAnimation, int attackAnimationNumberOfFrames) {
+        move = AssetUtils.createFromAtlas(atlas, moveAnimation, moveAnimationNumberOfFrames, 1);
         move.setPlayMode(Animation.PlayMode.LOOP);
-        attack = AssetUtils.createFromAtlas(atlas,"attack",2);
+        attack = AssetUtils.createFromAtlas(atlas,attackAnimation,attackAnimationNumberOfFrames);
         attack.setPlayMode(Animation.PlayMode.LOOP);
         enemyState = EnemyState.chill;
+    }
 
+    private void setChasing(TextureAtlas.AtlasRegion region) {
         FixtureDef fdef = new FixtureDef();
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(((region.getRegionWidth() + 300) / 2) / PPM, 10 / PPM, new Vector2((region.getRegionWidth() / 2) / PPM, 0), 0);
         fdef.shape = shape;
         fdef.isSensor = true;
         chasingTrigger = body.createFixture(fdef);
+    }
 
+    private void setAttackTrigger(TextureAtlas.AtlasRegion region) {
         FixtureDef fdefAttack = new FixtureDef();
         PolygonShape shape2 = new PolygonShape();
-        shape2.setAsBox(((region.getRegionWidth()+20)/2)/PPM,4 / PPM, new Vector2((region.getRegionWidth()/2)/PPM,0),0);
+        shape2.setAsBox(((region.getRegionWidth()+90)/2)/PPM,4 / PPM, new Vector2((region.getRegionWidth()/2)/PPM,0),0);
         fdefAttack.shape = shape2;
         fdefAttack.isSensor=true;
         attackTrigger = body.createFixture(fdefAttack);
-
     }
+
+    private void setEnemyState() {
+        if (chasingTrigger.testPoint(player.getBoxWorldX(),player.getBoxWorldY()) &&
+                !((attackTrigger.testPoint(player.getBoxWorldX(),player.getBoxWorldY())))){
+            this.enemyState = EnemyState.chasing;
+
+        }else if (attackTrigger.testPoint(player.getBoxWorldX(),player.getBoxWorldY())){
+            this.enemyState = EnemyState.attack;
+
+        } else {
+            this.enemyState = EnemyState.chill;
+
+        }
+    }
+
     public void render(SpriteBatch batch){
         elapsedTime += Gdx.graphics.getDeltaTime();
 
@@ -80,31 +119,36 @@ public class Enemy {
 
     public void update(float delta) {
         Vector2 velocity = body.getLinearVelocity();
-
-        if (enemyState == EnemyState.chasing) {
-            if (direction == "Left"){
-                isFlipped = true;
-                body.applyForceToCenter(-accelerationSpeed * delta, 0, true);
-            }
-            else if(direction == "Right") {
-                isFlipped = false;
-                body.applyForceToCenter(accelerationSpeed * delta, 0, true);
-            }
-            if (currentAnimation != move ) {
+        setEnemyState();
+        if (enemyState == EnemyState.chasing){
+            isIdle = false;
+            body.setLinearDamping(0);
+            if (currentAnimation != move) {
                 currentAnimation = move;
                 elapsedTime = 0;
             }
-            isIdle = false;
-        }else if (enemyState == EnemyState.attack){
-            if (direction == "Left"){
-                isFlipped = true;
-            }
-            else if(direction == "Right") {
+            if (player.isFlipped()){
                 isFlipped = false;
+                if (velocity.x > -maxSpeed)
+                    body.applyForceToCenter(accelerationSpeed * delta, 0, true);
             }
-            if (currentAnimation != attack ) {
+            else {
+                isFlipped = true;
+                if (velocity.x > -maxSpeed)
+                    body.applyForceToCenter(-accelerationSpeed * delta, 0, true);
+            }
+        }else if (enemyState == EnemyState.attack){
+            isIdle = false;
+            body.setLinearDamping(2);
+            if (currentAnimation != attack) {
                 currentAnimation = attack;
                 elapsedTime = 0;
+            }
+            if (player.isFlipped()){
+                isFlipped = false;
+            }
+            else {
+                isFlipped = true;
             }
         }else {
             body.setLinearDamping(10);
@@ -113,21 +157,6 @@ public class Enemy {
         }
 
     }
-
-
-
-
-    public Fixture getChasingTrigger() {
-        return chasingTrigger;
-    }
-    public Fixture getAttackTrigger() {
-        return attackTrigger;
-    }
-    public void setEnemyState(EnemyState enemyState) {
-        this.enemyState = enemyState;
-    }
-    public void setDirection(String direction) {
-        this.direction = direction;
-    }
-
 }
+
+

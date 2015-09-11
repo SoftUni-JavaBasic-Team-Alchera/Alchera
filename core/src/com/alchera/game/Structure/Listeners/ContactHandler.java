@@ -12,12 +12,9 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 public class ContactHandler implements ContactListener {
 
     private Player player;
-    private Enemy enemy;
 
-    public ContactHandler(Player player, Enemy enemy){
-
+    public ContactHandler(Player player){
         this.player = player;
-        this.enemy = enemy;
     }
 
 
@@ -32,26 +29,6 @@ public class ContactHandler implements ContactListener {
             }
             Gdx.app.log("Grounded:", String.valueOf(true));
         }
-
-        //Enemy logic
-        if (contact.getFixtureA() == enemy.getChasingTrigger() || contact.getFixtureB() == enemy.getChasingTrigger() &&
-                !(contact.getFixtureA() == enemy.getAttackTrigger() || contact.getFixtureB() == enemy.getAttackTrigger())){
-            enemy.setEnemyState(EnemyState.chasing);
-            if (player.isFlipped()){
-                enemy.setDirection("Right");
-
-
-            }else if(!player.isFlipped()){
-                enemy.setDirection("Left");
-
-            }
-            Gdx.app.log("Enemy:", "Chasing");
-        }else if (contact.getFixtureA() == enemy.getAttackTrigger() || contact.getFixtureB() == enemy.getAttackTrigger()){
-            enemy.setEnemyState(EnemyState.attack);
-            Gdx.app.log("Enemy:", "Attack");
-        }else {
-            enemy.setEnemyState(EnemyState.chill);
-        }
     }
 
     @Override
@@ -59,14 +36,11 @@ public class ContactHandler implements ContactListener {
         if (contact.getFixtureA() == player.getGroundTrigger() || contact.getFixtureB() == player.getGroundTrigger()){
             if(contact.getFixtureA().getBody().getUserData() instanceof Enemy || contact.getFixtureB().getBody().getUserData() instanceof Enemy)
             {
+
             }else{
                 player.setGrounded(false);
             }
             Gdx.app.log("Grounded:", String.valueOf(false));
-        }
-        if (!(contact.getFixtureA() == enemy.getAttackTrigger() || contact.getFixtureB() == enemy.getAttackTrigger()) &&
-               ! (contact.getFixtureA() == player.getGroundTrigger() || contact.getFixtureB() == player.getGroundTrigger())){
-            enemy.setEnemyState(EnemyState.chill);
         }
     }
 

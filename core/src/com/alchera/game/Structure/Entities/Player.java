@@ -47,7 +47,7 @@ public class Player implements Disposable{
 
         FixtureDef fdef = new FixtureDef();
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(((region.getRegionWidth()-10)/2)/PPM,4 / PPM, new Vector2((region.getRegionWidth()/2)/PPM,0),0);
+        shape.setAsBox(((region.getRegionWidth())/2)/PPM,4 / PPM, new Vector2((region.getRegionWidth()/2)/PPM,0),0);
         fdef.shape = shape;
         fdef.isSensor = true;
 

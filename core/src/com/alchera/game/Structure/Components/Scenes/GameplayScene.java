@@ -34,11 +34,10 @@ public class GameplayScene extends Scene {
     protected void create(){
         // Create a box2d world to simulate all physics
         boxWorld = new World(new Vector2(0, -18), true);
-
         player = new Player(boxWorld);
-        enemy = new Enemy(boxWorld);
+        enemy = new Enemy(boxWorld,player,"sprites/enemy.txt",500,0,"move0","move",4,"attack",2);
 
-        contactHandler = new ContactHandler(player, enemy);
+        contactHandler = new ContactHandler(player);
         boxWorld.setContactListener(contactHandler);
         // Camera for the game world
         camera = new CustomCamera(player);
@@ -55,6 +54,7 @@ public class GameplayScene extends Scene {
         BodyFactory.CreateStaticRectangle(boxWorld, 50, 10, 150, 300, 1, 1);
         BodyFactory.CreateStaticRectangle(boxWorld, 100, 10, 250, 200, 1, 1);
     }
+
     @Override
     public void render() {
 
