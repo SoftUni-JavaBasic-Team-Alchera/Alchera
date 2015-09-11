@@ -26,6 +26,8 @@ public class Player implements Disposable{
     private float elapsedTime;
     private boolean isIdle;
     private boolean isGrounded;
+
+
     private boolean isFlipped;
     private boolean isAttacking;
 
@@ -45,7 +47,7 @@ public class Player implements Disposable{
 
         FixtureDef fdef = new FixtureDef();
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(((region.getRegionWidth()-5)/2)/PPM,2 / PPM, new Vector2((region.getRegionWidth()/2)/PPM,0),0);
+        shape.setAsBox(((region.getRegionWidth()-10)/2)/PPM,4 / PPM, new Vector2((region.getRegionWidth()/2)/PPM,0),0);
         fdef.shape = shape;
         fdef.isSensor = true;
 
@@ -60,6 +62,7 @@ public class Player implements Disposable{
         punch = AssetUtils.createFromAtlas(atlas,"punch",7);
         punch.setPlayMode(Animation.PlayMode.NORMAL);
         jump = AssetUtils.createFromAtlas(atlas,"jump",5);
+
         //spell = AssetUtils.createFromAtlas(atlas,"spell",11);
         //spell.setPlayMode(Animation.PlayMode.LOOP);
     }
@@ -139,7 +142,7 @@ public class Player implements Disposable{
         // If neither A or D is pressed, slowly stop the character, and reset values.
         else {
             if(isGrounded)
-                body.setLinearVelocity(MathUtils.lerp(velocity.x, 0, 0.3f), velocity.y);
+             body.setLinearVelocity(MathUtils.lerp(velocity.x, 0, 0.3f), velocity.y);
             else
                 body.setLinearVelocity(MathUtils.lerp(velocity.x, 0, 0.1f), velocity.y);
             if (!isAttacking && isGrounded && velocity.x < 0.3) {
@@ -183,6 +186,10 @@ public class Player implements Disposable{
 
     public Vector2 getBoxWorldPosition(){
         return this.body.getPosition();
+    }
+
+    public boolean isFlipped() {
+        return isFlipped;
     }
 
     @Override

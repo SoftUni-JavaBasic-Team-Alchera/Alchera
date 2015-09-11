@@ -2,6 +2,7 @@ package com.alchera.game.Structure.Components.Scenes;
 
 import com.alchera.game.Alchera;
 import com.alchera.game.Structure.Components.Camera.CustomCamera;
+import com.alchera.game.Structure.Entities.Enemys.Enemy;
 import com.alchera.game.Structure.Entities.Player;
 import com.alchera.game.Structure.Listeners.ContactHandler;
 import com.alchera.game.Structure.Managers.SceneManager;
@@ -9,8 +10,7 @@ import com.alchera.game.Structure.Utils.BodyFactory;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.*;
 
 import static com.alchera.game.Structure.Utils.Variables.PPM;
 
@@ -24,6 +24,7 @@ public class GameplayScene extends Scene {
     CustomCamera b2dcamera;
     Box2DDebugRenderer boxRenderer;
     Player player;
+    Enemy enemy;
     World boxWorld;
 
     public GameplayScene(SceneManager sm){
@@ -35,8 +36,9 @@ public class GameplayScene extends Scene {
         boxWorld = new World(new Vector2(0, -18), true);
 
         player = new Player(boxWorld);
+        enemy = new Enemy(boxWorld);
 
-        contactHandler = new ContactHandler(player);
+        contactHandler = new ContactHandler(player, enemy);
         boxWorld.setContactListener(contactHandler);
         // Camera for the game world
         camera = new CustomCamera(player);
@@ -62,6 +64,7 @@ public class GameplayScene extends Scene {
         batch.begin();
         // Draw the player.
         player.render(batch);
+        enemy.render(batch);
         // Draw ends here.
         batch.end();
 
@@ -75,6 +78,7 @@ public class GameplayScene extends Scene {
         boxWorld.step(delta, 8, 2);
         // Update player logic
         player.update(delta);
+        enemy.update(delta);
 
         // update both camera positions
         camera.update();

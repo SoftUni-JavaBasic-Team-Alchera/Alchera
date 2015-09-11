@@ -1,0 +1,46 @@
+enemy.png
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+attack0
+  rotate: false
+  xy: 2, 2
+  size: 40, 45
+  orig: 40, 45
+  offset: 0, 0
+  index: -1
+attack1
+  rotate: false
+  xy: 44, 2
+  size: 39, 46
+  orig: 39, 46
+  offset: 0, 0
+  index: -1
+move0
+  rotate: false
+  xy: 85, 2
+  size: 35, 40
+  orig: 35, 40
+  offset: 0, 0
+  index: -1
+move1
+  rotate: false
+  xy: 122, 2
+  size: 34, 40
+  orig: 34, 40
+  offset: 0, 0
+  index: -1
+move2
+  rotate: false
+  xy: 158, 2
+  size: 30, 40
+  orig: 30, 40
+  offset: 0, 0
+  index: -1
+move3
+  rotate: false
+  xy: 190, 2
+  size: 33, 40
+  orig: 33, 40
+  offset: 0, 0
+  index: -1
