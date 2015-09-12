@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="30" height="15" tilewidth="70" tileheight="70" nextobjectid="24">
+ <tileset firstgid="1" name="set" tilewidth="70" tileheight="70" spacing="2" tilecount="156">
+  <image source="sprites/mapsheet.png" width="914" height="936"/>
+ </tileset>
+ <layer name="Tile Layer 2" width="30" height="15">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2AUjIJRQC5IJ4BHweAHAIkjAzk=
+  </data>
+ </layer>
+ <layer name="Tile Layer 1" width="30" height="15">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2DoAcmBdgAU6A2QvVZA7EihGehhqAjEGURiGNDEY34gEW4A2SkKxDOJxLjcw0mCG0i1Ex+egcduEChBciM5do4C+gAABPAiBg==
+  </data>
+ </layer>
+ <objectgroup name="bounds">
+  <object id="1" x="0" y="282">
+   <polyline points="0,0 0,418 419,417 554,552"/>
+  </object>
+  <object id="6" x="1050" y="561" width="69.5" height="68"/>
+  <object id="8" x="1680" y="349.5" width="70.5" height="69.5"/>
+  <object id="9" name="exit" x="1985.5" y="522.5" width="26" height="24">
+   <ellipse/>
+  </object>
+  <object id="10" name="playerspawn" x="78" y="646" width="21" height="21">
+   <ellipse/>
+  </object>
+  <object id="12" x="630" y="630" width="70" height="25.3333"/>
+  <object id="15" x="839.333" y="700" width="70" height="25.3333"/>
+  <object id="16" x="980.333" y="770.333" width="209.667" height="27.3333"/>
+  <object id="18" x="1189.67" y="770.667">
+   <polyline points="0,0 211,-211 910,-211"/>
+  </object>
+  <object id="20" name="enemy" x="1084.85" y="730.303" width="21.2121" height="21.2121">
+   <ellipse/>
+  </object>
+  <object id="21" x="2093.94" y="560.606">
+   <polyline points="0,0 3.0303,-600"/>
+  </object>
+  <object id="23" name="enemy" x="1495.45" y="489.394" width="21.2121" height="21.2121">
+   <ellipse/>
+  </object>
+ </objectgroup>
+</map>

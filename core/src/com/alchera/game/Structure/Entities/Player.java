@@ -40,14 +40,17 @@ public class Player implements Disposable{
     private Animation currentAnimation;
 
     public Player(World world){
+        this(world,10,10);
+    }
 
+    public Player(World world, float x, float y){
         atlas = new TextureAtlas(Gdx.files.internal("sprites/player.txt"));
         TextureAtlas.AtlasRegion region = atlas.findRegion("run0");
-        body = BodyFactory.CreateDynamicRectangle(world,region.getRegionWidth(),region.getRegionHeight(),10,10,0.2f,0);
+        body = BodyFactory.CreateDynamicRectangle(world,region.getRegionWidth(),region.getRegionHeight(),x,y,0.2f,0);
 
         FixtureDef fdef = new FixtureDef();
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(((region.getRegionWidth())/2)/PPM,4 / PPM, new Vector2((region.getRegionWidth()/2)/PPM,0),0);
+        shape.setAsBox(((region.getRegionWidth())/2)/PPM,8 / PPM, new Vector2((region.getRegionWidth()/2)/PPM,0),0);
         fdef.shape = shape;
         fdef.isSensor = true;
 
@@ -182,6 +185,10 @@ public class Player implements Disposable{
 
     public float getBoxWorldY(){
         return this.body.getPosition().y;
+    }
+
+    public void setPosition(float x,float y){
+        this.body.getPosition().set(x/PPM,y/PPM);
     }
 
     public Vector2 getBoxWorldPosition(){

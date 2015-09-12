@@ -29,6 +29,11 @@ public class ContactHandler implements ContactListener {
             }
             Gdx.app.log("Grounded:", String.valueOf(true));
         }
+
+        if (contact.getFixtureB().getUserData() != null)
+            if(contact.getFixtureB().getUserData().equals("exit"))
+                Gdx.app.exit();
+
     }
 
     @Override
@@ -42,6 +47,7 @@ public class ContactHandler implements ContactListener {
             }
             Gdx.app.log("Grounded:", String.valueOf(false));
         }
+
     }
 
     @Override

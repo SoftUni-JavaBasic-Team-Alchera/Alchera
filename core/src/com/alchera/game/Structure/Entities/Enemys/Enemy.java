@@ -127,7 +127,7 @@ public class Enemy{
                 currentAnimation = move;
                 elapsedTime = 0;
             }
-            if (player.isFlipped()){
+            if (player.getBoxWorldX() > this.body.getPosition().x){
                 isFlipped = false;
                 if (velocity.x > -maxSpeed)
                     body.applyForceToCenter(accelerationSpeed * delta, 0, true);
@@ -144,7 +144,7 @@ public class Enemy{
                 currentAnimation = attack;
                 elapsedTime = 0;
             }
-            if (player.isFlipped()){
+            if (player.getBoxWorldX() > this.body.getPosition().x){
                 isFlipped = false;
             }
             else {

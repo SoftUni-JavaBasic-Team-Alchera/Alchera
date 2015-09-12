@@ -4,6 +4,7 @@ import com.alchera.game.Alchera;
 import com.alchera.game.Structure.Components.Camera.CustomCamera;
 import com.alchera.game.Structure.Entities.Enemys.Enemy;
 import com.alchera.game.Structure.Entities.Player;
+import com.alchera.game.Structure.Levels.Level;
 import com.alchera.game.Structure.Listeners.ContactHandler;
 import com.alchera.game.Structure.Managers.SceneManager;
 import com.alchera.game.Structure.Utils.BodyFactory;
@@ -11,6 +12,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+
+import java.util.ArrayList;
 
 import static com.alchera.game.Structure.Utils.Variables.PPM;
 
@@ -24,8 +27,10 @@ public class GameplayScene extends Scene {
     CustomCamera b2dcamera;
     Box2DDebugRenderer boxRenderer;
     Player player;
+    ArrayList<Enemy> enemies;
     Enemy enemy;
     World boxWorld;
+    Level level;
 
     public GameplayScene(SceneManager sm){
         super(sm);
@@ -33,10 +38,17 @@ public class GameplayScene extends Scene {
     @Override
     protected void create(){
         // Create a box2d world to simulate all physics
-        boxWorld = new World(new Vector2(0, -18), true);
-        player = new Player(boxWorld);
-        enemy = new Enemy(boxWorld,player,"sprites/enemy.txt",500,0,"move0","move",4,"attack",2);
+        enemies = new ArrayList<Enemy>();
 
+
+
+        boxWorld = new World(new Vector2(0, -18), true);
+        level = new Level(batch,boxWorld);
+        player = new Player(boxWorld,level.playerSpawn.x,level.playerSpawn.y);
+        //enemy = new Enemy(boxWorld,player,"sprites/enemy.txt",500,400,"move0","move",4,"attack",2);
+        for(Vector2 vec : level.getEnemyCoordinates()){
+            enemies.add(new Enemy(boxWorld,player,"sprites/enemy.txt",(int)vec.x,(int)vec.y,"move0","move",4,"attack",2));
+        }
         contactHandler = new ContactHandler(player);
         boxWorld.setContactListener(contactHandler);
         // Camera for the game world
@@ -47,12 +59,6 @@ public class GameplayScene extends Scene {
         b2dcamera.isBox2DCamera(true);
         // Debug renderer to see a representation of what happens in the Box2D world.
         boxRenderer = new Box2DDebugRenderer();
-
-        BodyFactory.CreateStaticRectangle(boxWorld, Alchera.WIDTH, 10, 0, 0, 1, 1);
-        BodyFactory.CreateStaticRectangle(boxWorld, 50, 10, 50, 100, 1, 1);
-        BodyFactory.CreateStaticRectangle(boxWorld, 50, 10, 0, 200, 1, 1);
-        BodyFactory.CreateStaticRectangle(boxWorld, 50, 10, 150, 300, 1, 1);
-        BodyFactory.CreateStaticRectangle(boxWorld, 100, 10, 250, 200, 1, 1);
     }
 
     @Override
@@ -61,12 +67,17 @@ public class GameplayScene extends Scene {
         // Clear the color buffer.
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         // Draw begins here.
+        level.render(camera);
         batch.begin();
         // Draw the player.
         player.render(batch);
-        enemy.render(batch);
+        for (Enemy enemy : enemies){
+            enemy.render(batch);
+        }
         // Draw ends here.
         batch.end();
+
+
 
         // Draw the Box2D world.
         boxRenderer.render(boxWorld, b2dcamera.combined);
@@ -78,7 +89,9 @@ public class GameplayScene extends Scene {
         boxWorld.step(delta, 8, 2);
         // Update player logic
         player.update(delta);
-        enemy.update(delta);
+        for (Enemy enemy : enemies){
+            enemy.update(delta);
+        }
 
         // update both camera positions
         camera.update();
