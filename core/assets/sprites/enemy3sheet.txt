@@ -1,0 +1,81 @@
+enemy3sheet.png
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+attack0
+  rotate: false
+  xy: 2, 2
+  size: 15, 31
+  orig: 15, 31
+  offset: 0, 0
+  index: -1
+attack1
+  rotate: false
+  xy: 2, 35
+  size: 28, 34
+  orig: 28, 34
+  offset: 0, 0
+  index: -1
+attack2
+  rotate: false
+  xy: 2, 71
+  size: 18, 34
+  orig: 18, 34
+  offset: 0, 0
+  index: -1
+walk0
+  rotate: false
+  xy: 2, 107
+  size: 11, 35
+  orig: 11, 35
+  offset: 0, 0
+  index: -1
+walk1
+  rotate: false
+  xy: 15, 107
+  size: 15, 35
+  orig: 15, 35
+  offset: 0, 0
+  index: -1
+walk2
+  rotate: false
+  xy: 2, 144
+  size: 12, 35
+  orig: 12, 35
+  offset: 0, 0
+  index: -1
+walk3
+  rotate: false
+  xy: 16, 144
+  size: 11, 35
+  orig: 11, 35
+  offset: 0, 0
+  index: -1
+walk4
+  rotate: false
+  xy: 2, 181
+  size: 11, 35
+  orig: 11, 35
+  offset: 0, 0
+  index: -1
+walk5
+  rotate: false
+  xy: 15, 181
+  size: 14, 35
+  orig: 14, 35
+  offset: 0, 0
+  index: -1
+walk6
+  rotate: false
+  xy: 2, 218
+  size: 11, 35
+  orig: 11, 35
+  offset: 0, 0
+  index: -1
+walk7
+  rotate: false
+  xy: 15, 218
+  size: 11, 35
+  orig: 11, 35
+  offset: 0, 0
+  index: -1
