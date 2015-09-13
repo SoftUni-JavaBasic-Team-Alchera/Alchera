@@ -4,10 +4,7 @@ import com.alchera.game.Structure.Entities.Enemys.Enemy;
 import com.alchera.game.Structure.Entities.Enemys.EnemyState;
 import com.alchera.game.Structure.Entities.Player;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.physics.box2d.Contact;
-import com.badlogic.gdx.physics.box2d.ContactImpulse;
-import com.badlogic.gdx.physics.box2d.ContactListener;
-import com.badlogic.gdx.physics.box2d.Manifold;
+import com.badlogic.gdx.physics.box2d.*;
 
 public class ContactHandler implements ContactListener {
 
@@ -31,8 +28,11 @@ public class ContactHandler implements ContactListener {
         }
 
         if (contact.getFixtureB().getUserData() != null)
-            if(contact.getFixtureB().getUserData().equals("exit"))
+            if(contact.getFixtureB().getUserData().equals("exit")){
                 Gdx.app.exit();
+            }
+
+
 
     }
 

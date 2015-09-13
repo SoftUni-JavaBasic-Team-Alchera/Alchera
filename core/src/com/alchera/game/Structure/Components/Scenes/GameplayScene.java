@@ -45,7 +45,6 @@ public class GameplayScene extends Scene {
         boxWorld = new World(new Vector2(0, -18), true);
         level = new Level(batch,boxWorld);
         player = new Player(boxWorld,level.playerSpawn.x,level.playerSpawn.y);
-        //enemy = new Enemy(boxWorld,player,"sprites/enemy.txt",500,400,"move0","move",4,"attack",2);
         for(Vector2 vec : level.getEnemyCoordinates()){
             enemies.add(new Enemy(boxWorld,player,"sprites/enemy.txt",(int)vec.x,(int)vec.y,"move0","move",4,"attack",2));
         }

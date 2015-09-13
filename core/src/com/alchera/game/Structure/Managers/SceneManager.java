@@ -2,6 +2,7 @@ package com.alchera.game.Structure.Managers;
 
 import com.alchera.game.Alchera;
 import com.alchera.game.Structure.Components.Scenes.GameplayScene;
+import com.alchera.game.Structure.Components.Scenes.MainMenu;
 import com.alchera.game.Structure.Components.Scenes.Scene;
 import com.alchera.game.Structure.Components.Scenes.SplashScene;
 
@@ -17,7 +18,6 @@ public class SceneManager {
         SPLASH,
         MAINMENU,
         GAMEPLAY,
-        OPTIONS,
         CREDITS
     }
 
@@ -27,7 +27,7 @@ public class SceneManager {
     public SceneManager(final Alchera app){
         this.application = app;
         this.scenes = new PriorityQueue<Scene>();
-        this.setScene(SceneType.GAMEPLAY);
+        this.setScene(SceneType.SPLASH);
     }
 
     public void update(float delta){
@@ -55,14 +55,10 @@ public class SceneManager {
         switch (type){
             case SPLASH:
                 return new SplashScene(this);
-            case MAINMENU:
-                // TODO: Implement main menu scene
-                return null;
             case GAMEPLAY:
+                return new MainMenu(this);
+            case MAINMENU:
                 return new GameplayScene(this);
-            case OPTIONS:
-                // TODO: Implement options menu scene
-                return null;
             case CREDITS:
                 // TODO: Implement credits scene
                 return null;
