@@ -20,7 +20,7 @@ public class Player implements Disposable{
 
     private Body body;
     private Fixture groundTrigger;
-    //private int lifes;
+    private int lives;
     private int health;
     //private float mana;
     private float elapsedTime;
@@ -187,6 +187,14 @@ public class Player implements Disposable{
         return this.body.getPosition().y;
     }
 
+    public int getLives() { return lives; }
+
+    public void setLives(int lives) { this.lives = lives; }
+
+    public int getHealth() { return health; }
+
+    public void setHealth(int health) { this.health = health; }
+
     public void setPosition(float x,float y){
         this.body.getPosition().set(x/PPM,y/PPM);
     }
@@ -203,4 +211,6 @@ public class Player implements Disposable{
     public void dispose() {
         atlas.dispose();
     }
+
+
 }

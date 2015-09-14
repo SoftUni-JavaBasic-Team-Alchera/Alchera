@@ -5,9 +5,11 @@ package com.alchera.game.Structure.Entities.Bonuses;
  */
 public enum BonusType {
 
-    HEALTH,
-    JUMP,
     ATTACK,
+    DESTROY,
+    JUMP,
+    HEALTH,
+    LIFE,
     SPEED,
-    DESTROY
+
 }
