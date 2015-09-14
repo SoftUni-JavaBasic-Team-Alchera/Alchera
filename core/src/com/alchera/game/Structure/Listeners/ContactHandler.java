@@ -31,9 +31,6 @@ public class ContactHandler implements ContactListener {
             if(contact.getFixtureB().getUserData().equals("exit")){
                 Gdx.app.exit();
             }
-
-
-
     }
 
     @Override

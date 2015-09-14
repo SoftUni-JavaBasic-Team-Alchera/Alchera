@@ -46,7 +46,9 @@ public class GameplayScene extends Scene {
         level = new Level(batch,boxWorld);
         player = new Player(boxWorld,level.playerSpawn.x,level.playerSpawn.y);
         for(Vector2 vec : level.getEnemyCoordinates()){
-            enemies.add(new Enemy(boxWorld,player,"sprites/enemy.txt",(int)vec.x,(int)vec.y,"move0","move",4,"attack",2));
+
+            enemies.add(new Enemy(boxWorld,player,"sprites/bosssheet.txt",(int)vec.x,(int)vec.y,"attack0","walk",9,"attack",2));
+
         }
         contactHandler = new ContactHandler(player);
         boxWorld.setContactListener(contactHandler);

@@ -1,0 +1,95 @@
+enemy2sheet.png
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+attack0
+  rotate: false
+  xy: 2, 2
+  size: 37, 41
+  orig: 37, 41
+  offset: 0, 0
+  index: -1
+attack1
+  rotate: false
+  xy: 41, 2
+  size: 35, 47
+  orig: 35, 47
+  offset: 0, 0
+  index: -1
+attack2
+  rotate: false
+  xy: 78, 2
+  size: 31, 53
+  orig: 31, 53
+  offset: 0, 0
+  index: -1
+attack3
+  rotate: false
+  xy: 111, 2
+  size: 50, 52
+  orig: 50, 52
+  offset: 0, 0
+  index: -1
+walk0
+  rotate: false
+  xy: 163, 2
+  size: 33, 43
+  orig: 33, 43
+  offset: 0, 0
+  index: -1
+walk1
+  rotate: false
+  xy: 198, 2
+  size: 33, 42
+  orig: 33, 42
+  offset: 0, 0
+  index: -1
+walk2
+  rotate: false
+  xy: 233, 2
+  size: 33, 42
+  orig: 33, 42
+  offset: 0, 0
+  index: -1
+walk3
+  rotate: false
+  xy: 268, 2
+  size: 33, 42
+  orig: 33, 42
+  offset: 0, 0
+  index: -1
+walk4
+  rotate: false
+  xy: 303, 2
+  size: 35, 43
+  orig: 35, 43
+  offset: 0, 0
+  index: -1
+walk5
+  rotate: false
+  xy: 340, 2
+  size: 36, 42
+  orig: 36, 42
+  offset: 0, 0
+  index: -1
+walk6
+  rotate: false
+  xy: 378, 2
+  size: 37, 41
+  orig: 37, 41
+  offset: 0, 0
+  index: -1
+walk7
+  rotate: false
+  xy: 417, 2
+  size: 33, 41
+  orig: 33, 41
+  offset: 0, 0
+  index: -1
+walk8
+  rotate: false
+  xy: 452, 2
+  size: 34, 41
+  orig: 34, 41
+  offset: 0, 0
+  index: -1
