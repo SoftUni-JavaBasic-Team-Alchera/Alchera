@@ -1,13 +1,11 @@
 package com.alchera.game.Structure.Levels;
 
-import com.alchera.game.Alchera;
 import com.alchera.game.Structure.Utils.ShapeFactory;
 import com.alchera.game.Structure.Utils.Variables;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
-import com.badlogic.gdx.maps.objects.CircleMapObject;
 import com.badlogic.gdx.maps.objects.EllipseMapObject;
 import com.badlogic.gdx.maps.objects.PolylineMapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;

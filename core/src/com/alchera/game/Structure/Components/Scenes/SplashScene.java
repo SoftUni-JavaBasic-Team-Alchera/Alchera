@@ -69,7 +69,7 @@ public class SplashScene extends Scene {
             Gdx.app.log("Alpha:", String.valueOf(alpha));
             blackPixel.setColor(0,0,0,alpha >= 1 ? 1 : alpha);
             if (alpha >= 1f){
-                manager.setScene(SceneManager.SceneType.GAMEPLAY);
+                manager.setScene(SceneManager.SceneType.MAINMENU);
             }
 
         }

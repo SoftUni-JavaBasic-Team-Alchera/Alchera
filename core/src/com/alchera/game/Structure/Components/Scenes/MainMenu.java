@@ -4,6 +4,7 @@ import com.alchera.game.Structure.Managers.SceneManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
@@ -54,6 +55,7 @@ public class MainMenu extends Scene{
 
     @Override
     public void render() {
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
         //draw weasel
         batch.draw(weasel,800,0);
@@ -94,7 +96,7 @@ public class MainMenu extends Scene{
 
     private void changeGameState(){
         if (currentItem == 0){
-            manager.setScene(SceneManager.SceneType.MAINMENU);
+            manager.setScene(SceneManager.SceneType.GAMEPLAY);
         }if (currentItem == 1){
             manager.setScene(SceneManager.SceneType.CREDITS);
         }if (currentItem ==2){

@@ -52,9 +52,9 @@ public class SceneManager {
         switch (type){
             case SPLASH:
                 return new SplashScene(this);
-            case GAMEPLAY:
-                return new MainMenu(this);
             case MAINMENU:
+                return new MainMenu(this);
+            case GAMEPLAY:
                 return new GameplayScene(this);
             case CREDITS:
                 return new CreditsScene(this);
