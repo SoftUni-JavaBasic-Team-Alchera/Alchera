@@ -1,7 +1,6 @@
 package com.alchera.game.Structure.Components.Scenes;
 
 import com.alchera.game.Structure.Managers.SceneManager;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
