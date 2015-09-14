@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="30" height="15" tilewidth="70" tileheight="70" nextobjectid="44">
+ <tileset firstgid="1" name="set" tilewidth="70" tileheight="70" spacing="2" tilecount="156">
+  <image source="sprites/mapsheet.png" width="914" height="936"/>
+ </tileset>
+ <layer name="Ground" width="30" height="15">
+  <data encoding="base64" compression="zlib">
+   eJxjYCAN5JGonlpgqNs7iQCmlb2kguFoL75wZ6ahvaNgFIyCoQEAd8gLJg==
+  </data>
+ </layer>
+ <layer name="extra" width="30" height="15">
+  <data encoding="base64" compression="zlib">
+   eJxjYKAc5FHBDHrY6walNeloryMQW1FoHzH2TsKBqWVvKxKmNjAlUh0t7CYWDLTdtLLfFg3jsn+wgFYcWAqKcaVTEH86DkyM/ypJwMjmElKLyz+tROqnFR5pAAAeQjJH
+  </data>
+ </layer>
+ <objectgroup name="bounds">
+  <object id="1" x="0" y="103.03">
+   <polyline points="0,0 -2,593.524 417,592.2 418,592.97"/>
+  </object>
+  <object id="6" x="1122" y="559" width="272" height="68"/>
+  <object id="8" x="1186" y="-2.5" width="70.5" height="282.5"/>
+  <object id="9" name="exit" x="2045.5" y="174.5" width="26" height="24">
+   <ellipse/>
+  </object>
+  <object id="10" name="playerspawn" x="44" y="186" width="21" height="21">
+   <ellipse/>
+  </object>
+  <object id="12" x="560" y="700" width="208" height="68"/>
+  <object id="15" x="839.333" y="-4" width="70.0003" height="421.333"/>
+  <object id="16" x="1540" y="768.333" width="556" height="71.667"/>
+  <object id="18" x="1561.24" y="327.363">
+   <polyline points="123.338,-79.3634 122.756,-114.696 529.423,-114.696"/>
+  </object>
+  <object id="20" name="enemy" x="756.85" y="380.303" width="21.2121" height="21.2121">
+   <ellipse/>
+  </object>
+  <object id="21" x="2093.97" y="772.727">
+   <polyline points="0,0 0.00030303,-812.121"/>
+  </object>
+  <object id="23" name="enemy" x="2031.45" y="709.394" width="21.2121" height="21.2121">
+   <ellipse/>
+  </object>
+  <object id="27" x="340" y="421.212" width="566.667" height="41.8182"/>
+  <object id="30" x="3.0303" y="210.667" width="555.636" height="40.8485"/>
+  <object id="33" x="978" y="702" width="72" height="68"/>
+  <object id="35" x="906" y="766" width="72" height="68"/>
+  <object id="36" name="enemy" x="159.394" y="649.394" width="21.2121" height="21.2121">
+   <ellipse/>
+  </object>
+  <object id="37" x="1187" y="282" width="283" height="68"/>
+  <object id="39" x="1469.83" y="351.333" width="70.8333" height="68"/>
+  <object id="40" x="1536.58" y="419.333" width="70.8333" height="68"/>
+  <object id="41" x="1608.58" y="490" width="139.417" height="68"/>
+  <object id="42" x="1747.25" y="560.667" width="70.8333" height="68"/>
+  <object id="43" x="1474" y="702.833" width="63.3333" height="71.667"/>
+ </objectgroup>
+</map>
