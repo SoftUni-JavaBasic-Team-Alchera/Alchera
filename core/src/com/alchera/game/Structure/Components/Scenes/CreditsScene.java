@@ -41,7 +41,7 @@ public class CreditsScene extends Scene {
         font.setColor(Color.WHITE);
 
         teamNames = new String[]{
-                "DESIGN & PRODUCTION",
+                "DESIGN and PRODUCTION",
                 "Ylian Rusev",
                 "Vasil Nedyalkov",
                 "Boyan Blagiev",

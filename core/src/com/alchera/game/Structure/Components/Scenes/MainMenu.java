@@ -96,7 +96,7 @@ public class MainMenu extends Scene{
         if (currentItem == 0){
             manager.setScene(SceneManager.SceneType.MAINMENU);
         }if (currentItem == 1){
-            //manager.setScene(SceneManager.SceneType.CREDITS);
+            manager.setScene(SceneManager.SceneType.CREDITS);
         }if (currentItem ==2){
             Gdx.app.exit();
         }

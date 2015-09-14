@@ -1,10 +1,7 @@
 package com.alchera.game.Structure.Managers;
 
 import com.alchera.game.Alchera;
-import com.alchera.game.Structure.Components.Scenes.GameplayScene;
-import com.alchera.game.Structure.Components.Scenes.MainMenu;
-import com.alchera.game.Structure.Components.Scenes.Scene;
-import com.alchera.game.Structure.Components.Scenes.SplashScene;
+import com.alchera.game.Structure.Components.Scenes.*;
 
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -60,8 +57,7 @@ public class SceneManager {
             case MAINMENU:
                 return new GameplayScene(this);
             case CREDITS:
-                // TODO: Implement credits scene
-                return null;
+                return new CreditsScene(this);
 
         }
         return null;
