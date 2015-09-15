@@ -44,8 +44,6 @@ public abstract class Overlay implements Disposable{
     }
 
     public void update(float delta){
-        if (!isVisible)
-            return;
         for(UIComponent component : components){
             if (component.isVisible()){
                 component.update(delta);

@@ -1,7 +1,7 @@
 package com.alchera.game.Structure.Listeners;
 
+import com.alchera.game.Structure.Entities.Bonuses.Bonus;
 import com.alchera.game.Structure.Entities.Enemys.Enemy;
-import com.alchera.game.Structure.Entities.Enemys.EnemyState;
 import com.alchera.game.Structure.Entities.Player;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.physics.box2d.*;
@@ -17,29 +17,35 @@ public class ContactHandler implements ContactListener {
 
     @Override
     public void beginContact(Contact contact) {
-        if (contact.getFixtureA() == player.getGroundTrigger() || contact.getFixtureB() == player.getGroundTrigger()){
-            if(contact.getFixtureA().getBody().getUserData() instanceof Enemy || contact.getFixtureB().getBody().getUserData() instanceof Enemy)
-            {
+        Fixture a = contact.getFixtureA();
+        Fixture b = contact.getFixtureB();
 
-            }else{
+        if (isGroundTrigger(a,b)){
+            if(!isEnemy(b) && !isBonus(b))
+            {
                 player.setGrounded(true);
             }
             Gdx.app.log("Grounded:", String.valueOf(true));
         }
 
-        if (contact.getFixtureB().getUserData() != null)
-            if(contact.getFixtureB().getUserData().equals("exit")){
-                Gdx.app.exit();
-            }
+        if (player.getBody().getFixtureList().get(0) == a && isBonus(b)){
+            Bonus bonus = (Bonus)b.getUserData();
+            bonus.activate(player);
+        }
+
+        if(isExit(b)){
+            Gdx.app.exit();
+        }
     }
 
     @Override
     public void endContact(Contact contact) {
-        if (contact.getFixtureA() == player.getGroundTrigger() || contact.getFixtureB() == player.getGroundTrigger()){
-            if(contact.getFixtureA().getBody().getUserData() instanceof Enemy || contact.getFixtureB().getBody().getUserData() instanceof Enemy)
-            {
+        Fixture a = contact.getFixtureA();
+        Fixture b = contact.getFixtureB();
 
-            }else{
+        if (isGroundTrigger(a, b)){
+            if(!isEnemy(b) && !isBonus(b))
+            {
                 player.setGrounded(false);
             }
             Gdx.app.log("Grounded:", String.valueOf(false));
@@ -55,5 +61,22 @@ public class ContactHandler implements ContactListener {
     @Override
     public void postSolve(Contact contact, ContactImpulse impulse) {
 
+    }
+
+
+    private boolean isGroundTrigger(Fixture a, Fixture b){
+        return a == player.getGroundTrigger() || b == player.getGroundTrigger();
+    }
+
+    private boolean isEnemy(Fixture b){
+        return b.getBody().getUserData() != null && b.getBody().getUserData() instanceof Enemy;
+    }
+
+    private boolean isExit(Fixture b){
+        return b.getUserData() != null && b.getUserData().equals("exit");
+    }
+
+    private boolean isBonus(Fixture b){
+        return b.getUserData() != null && b.getUserData() instanceof Bonus;
     }
 }

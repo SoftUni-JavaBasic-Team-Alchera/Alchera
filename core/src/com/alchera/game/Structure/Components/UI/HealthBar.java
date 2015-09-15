@@ -18,7 +18,7 @@ public class HealthBar extends BaseUIComponent {
     private float scale;
 
     public HealthBar(Player player){
-        this.heart = new Sprite(new Texture(Gdx.files.internal("sprites/heart.png")));
+        this.heart = new Sprite(new Texture(Gdx.files.internal("sprites/bonusheart.png")));
         this.player = player;
         this.isVisible = true;
         this.scale = 0.5f;

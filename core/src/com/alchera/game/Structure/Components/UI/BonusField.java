@@ -58,6 +58,8 @@ public class BonusField extends BaseUIComponent {
         for(Bonus bonus : bonuses){
             if (bonus.isEffectOver()){
                 bonuses.remove(bonus);
+            }else{
+                bonus.update(delta);
             }
         }
     }

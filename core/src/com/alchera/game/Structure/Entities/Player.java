@@ -17,7 +17,8 @@ public class Player implements Disposable{
     private final float accelerationSpeed = 20f; // Does not mean it instantly goes to 10f, it does it gradually
     private final float maxSpeed = 4f;
     private final float jumpForce = 20f;
-
+    private float jumpMultiplier = 1;
+    private float speedBoost = 0;
     private Body body;
     private Fixture groundTrigger;
     private int lives;
@@ -47,6 +48,7 @@ public class Player implements Disposable{
         atlas = new TextureAtlas(Gdx.files.internal("sprites/player.txt"));
         TextureAtlas.AtlasRegion region = atlas.findRegion("run0");
         body = BodyFactory.CreateDynamicRectangle(world,region.getRegionWidth(),region.getRegionHeight(),x,y,0.2f,0);
+        body.setUserData(this);
 
         FixtureDef fdef = new FixtureDef();
         PolygonShape shape = new PolygonShape();
@@ -88,7 +90,7 @@ public class Player implements Disposable{
 
         // Handle jumping with flipping of the animation. Can jump only if there's a contact with the groundTrigger.
         if (Gdx.input.isKeyJustPressed(Keys.SPACE) && isGrounded) {
-            body.applyForceToCenter(0, jumpForce, true);
+            body.applyForceToCenter(0, jumpForce * jumpMultiplier, true);
             isGrounded = false;
             if (currentAnimation != jump && !isAttacking) {
                 currentAnimation = jump;
@@ -123,7 +125,7 @@ public class Player implements Disposable{
                 elapsedTime = 0;
             }
             isIdle = false;
-            if (velocity.x > -maxSpeed)
+            if (velocity.x > -(maxSpeed + speedBoost))
                 body.applyForceToCenter(-accelerationSpeed * delta, 0, true);
 
         }
@@ -139,7 +141,7 @@ public class Player implements Disposable{
                 elapsedTime = 0;
             }
             isIdle = false;
-            if (velocity.x < maxSpeed)
+            if (velocity.x < maxSpeed + speedBoost)
                 body.applyForceToCenter(accelerationSpeed * delta, 0, true);
         }
         // If neither A or D is pressed, slowly stop the character, and reset values.
@@ -205,6 +207,22 @@ public class Player implements Disposable{
 
     public boolean isFlipped() {
         return isFlipped;
+    }
+
+    public void setBonusSpeed(float speed){
+        this.speedBoost = speed;
+    }
+
+    public float getBonusSpeed(){
+        return this.speedBoost;
+    }
+
+    public void setJumpMultiplier(float mult){
+        this.jumpMultiplier = mult;
+    }
+
+    public float getJumpMultiplier(){
+        return this.jumpMultiplier;
     }
 
     @Override

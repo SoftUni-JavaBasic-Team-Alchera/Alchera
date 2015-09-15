@@ -3,6 +3,7 @@ package com.alchera.game.Structure.Components.Scenes;
 import com.alchera.game.Alchera;
 import com.alchera.game.Structure.Components.Camera.CustomCamera;
 import com.alchera.game.Structure.Components.Overlays.Hud;
+import com.alchera.game.Structure.Entities.Bonuses.Bonus;
 import com.alchera.game.Structure.Entities.Bonuses.BonusHealth;
 import com.alchera.game.Structure.Entities.Bonuses.BonusLife;
 import com.alchera.game.Structure.Entities.Bonuses.BonusSpeed;
@@ -19,6 +20,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import static com.alchera.game.Structure.Utils.Variables.PPM;
 
@@ -33,6 +35,7 @@ public class GameplayScene extends Scene {
     Box2DDebugRenderer boxRenderer;
     Player player;
     ArrayList<Enemy> enemies;
+    LinkedList<Bonus> bonuses;
     Hud hud;
     World boxWorld;
     Level level;
@@ -48,7 +51,9 @@ public class GameplayScene extends Scene {
 
 
         boxWorld = new World(new Vector2(0, -18), true);
+
         level = new Level(batch,boxWorld);
+        bonuses = level.getBonuses();
         player = new Player(boxWorld,level.playerSpawn.x,level.playerSpawn.y);
         hud = new Hud(manager,player);
         for(Vector2 vec : level.getEnemyCoordinates()){
@@ -81,6 +86,9 @@ public class GameplayScene extends Scene {
         for (Enemy enemy : enemies){
             enemy.render(batch);
         }
+        for (Bonus bonus : bonuses){
+            bonus.render(batch);
+        }
         hud.render();
         // Draw ends here.
         batch.end();
@@ -99,6 +107,17 @@ public class GameplayScene extends Scene {
         player.update(delta);
         for (Enemy enemy : enemies){
             enemy.update(delta);
+        }
+        for (Bonus bonus : bonuses){
+            if (bonus.isActivated()){
+                if (!(bonus instanceof BonusHealth))
+                    hud.getBonusField().addBonus(bonus);
+                boxWorld.destroyBody(bonus.getBody());
+                bonuses.remove(bonus);
+                continue;
+            }
+
+            bonus.update(delta);
         }
 
         // update both camera positions

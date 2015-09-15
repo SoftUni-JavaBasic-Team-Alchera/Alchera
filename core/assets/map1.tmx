@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="30" height="15" tilewidth="70" tileheight="70" nextobjectid="44">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="30" height="15" tilewidth="70" tileheight="70" nextobjectid="47">
  <tileset firstgid="1" name="set" tilewidth="70" tileheight="70" spacing="2" tilecount="156">
   <image source="sprites/mapsheet.png" width="914" height="936"/>
  </tileset>
@@ -53,5 +53,14 @@
   <object id="41" x="1608.58" y="490" width="139.417" height="68"/>
   <object id="42" x="1747.25" y="560.667" width="70.8333" height="68"/>
   <object id="43" x="1474" y="702.833" width="63.3333" height="71.667"/>
+  <object id="44" name="Bonus.Jump" x="1015" y="667">
+   <ellipse/>
+  </object>
+  <object id="45" name="Bonus.Speed" x="246" y="186">
+   <ellipse/>
+  </object>
+  <object id="46" name="Bonus.Health" x="1293" y="537">
+   <ellipse/>
+  </object>
  </objectgroup>
 </map>

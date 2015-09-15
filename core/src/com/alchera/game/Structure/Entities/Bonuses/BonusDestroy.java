@@ -8,14 +8,18 @@ import com.badlogic.gdx.math.Vector2;
  */
 public class BonusDestroy extends Bonus {
 
+    public BonusDestroy(float x, float y){
+        this(new Vector2(x,y));
+    }
+
+    @Override
+    public void activate(Object obj) {
+        //destroy all enemies
+    }
+
     public BonusDestroy(Vector2 position) {
         super(position);
         // TODO: Add sprite
         this.setType(BonusType.DESTROY);
-    }
-
-    public void Activate(/*collection of enemies*/) {
-
-        //destroy all enemies
     }
 }

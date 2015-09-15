@@ -11,16 +11,44 @@ import com.badlogic.gdx.math.Vector2;
  */
 public class BonusSpeed extends Bonus {
 
-    public BonusSpeed(Vector2 position) {
-        super(position);
-        this.sprite = new Sprite(new Texture(Gdx.files.internal("sprites/speed.png")));
-        this.sprite.setSize(30,30);
-
-        this.setType(BonusType.SPEED);
+    private Player player;
+    private final float bonusSpeed = 3f;
+    private float duration = 3f;
+    public BonusSpeed(float x, float y){
+        this(new Vector2(x,y));
     }
 
-    public void Activate(Player player) {
+    @Override
+    public void activate(Object obj) {
+        player = (Player)obj;
+        player.setBonusSpeed(player.getBonusSpeed() + bonusSpeed);
+        this.isActivated = true;
+    }
 
-        //increase speed
+    @Override
+    public void update(float delta) {
+        super.update(delta);
+        if (isActivated())
+            this.effect(delta);
+    }
+
+    @Override
+    protected void effect(float delta) {
+        duration -= delta;
+        if (duration <= 0){
+            this.isEffectOver = true;
+            player.setBonusSpeed(player.getBonusSpeed() - bonusSpeed);
+        }
+    }
+
+    public BonusSpeed(Vector2 position) {
+        super(position);
+        this.sprite = new Sprite(new Texture(Gdx.files.internal("sprites/bonusspeed.png")));
+        this.sprite.setPosition(
+                this.position.x-(defaultSize/2)* sprite.getScaleX(),
+                this.position.y-(defaultSize/2)* sprite.getScaleY());
+        this.sprite.setSize(defaultSize, defaultSize);
+        this.sprite.setOriginCenter();
+        this.setType(BonusType.SPEED);
     }
 }

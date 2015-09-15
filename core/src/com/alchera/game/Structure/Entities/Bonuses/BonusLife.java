@@ -8,14 +8,19 @@ import com.badlogic.gdx.math.Vector2;
  */
 public class BonusLife extends Bonus {
 
+    public BonusLife(float x, float y){
+        this(new Vector2(x, y));
+    }
+
+    @Override
+    public void activate(Object obj) {
+        Player player = (Player)obj;
+        player.setLives(player.getLives() + 1);
+    }
+
     public BonusLife(Vector2 position) {
         super(position);
         // TODO: Add sprite
         this.setType(BonusType.LIFE);
-    }
-
-    public void Activate(Player player) {
-
-        player.setLives(player.getLives() + 1);
     }
 }

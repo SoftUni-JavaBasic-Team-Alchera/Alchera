@@ -1,5 +1,9 @@
 package com.alchera.game.Structure.Levels;
 
+import com.alchera.game.Structure.Entities.Bonuses.Bonus;
+import com.alchera.game.Structure.Entities.Bonuses.BonusHealth;
+import com.alchera.game.Structure.Entities.Bonuses.BonusJump;
+import com.alchera.game.Structure.Entities.Bonuses.BonusSpeed;
 import com.alchera.game.Structure.Utils.ShapeFactory;
 import com.alchera.game.Structure.Utils.Variables;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -16,6 +20,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  * Created by Inspix on 12/09/2015.
@@ -25,13 +30,13 @@ public class Level {
     private TiledMap map;
     private OrthogonalTiledMapRenderer renderer;
     public Vector2 playerSpawn = new Vector2(0,0);
-    public ArrayList<Vector2> enemyCoordinates;
+    private ArrayList<Vector2> enemyCoordinates = new ArrayList<Vector2>();;
+    private LinkedList<Bonus> bonuses = new LinkedList<Bonus>();
 
 
     public Level(SpriteBatch batch,World world){
-        map = new TmxMapLoader().load("map.tmx");
+        map = new TmxMapLoader().load("map1.tmx");
         renderer = new OrthogonalTiledMapRenderer(map,batch);
-        enemyCoordinates = new ArrayList<Vector2>();
         parseObjectLayer(world,map.getLayers().get("bounds").getObjects());
     }
 
@@ -43,7 +48,9 @@ public class Level {
 
     private void parseObjectLayer(World world, MapObjects objects){
         for(MapObject object : objects){
+            boolean isBonus = false;
             Shape shape = null;
+            Object objectReference = null;
             Body body;
             BodyDef bdef = new BodyDef();
             FixtureDef fdef = new FixtureDef();
@@ -53,14 +60,37 @@ public class Level {
                 fdef.isSensor = false;
             }else if (object instanceof EllipseMapObject){
                 EllipseMapObject obj = (EllipseMapObject)object;
-                if (obj.getName().equals("playerspawn"))
+                name = obj.getName();
+                if (name.equals("playerspawn"))
                     playerSpawn.set(obj.getEllipse().x, obj.getEllipse().y);
-                else if (obj.getName().equals("enemy"))
+                else if (name.equals("enemy"))
                     enemyCoordinates.add(new Vector2(obj.getEllipse().x,obj.getEllipse().y));
-                else if (obj.getName().equals("exit")){
+                else if (name.equals("exit")){
                     shape = ShapeFactory.createCircle(obj);
                     fdef.isSensor = true;
-                    name = obj.getName();
+                }else if(name.startsWith("Bonus")){
+                    if (name.endsWith("Speed")){
+                        shape = ShapeFactory.createCircle(obj);
+                        fdef.isSensor = true;
+                        BonusSpeed bonus = new BonusSpeed(obj.getEllipse().x,obj.getEllipse().y);
+                        isBonus = true;
+                        bonuses.add(bonus);
+                        objectReference = bonus;
+                    }else if(name.endsWith("Health")){
+                        shape = ShapeFactory.createCircle(obj);
+                        fdef.isSensor = true;
+                        BonusHealth bonus = new BonusHealth(obj.getEllipse().x,obj.getEllipse().y);
+                        isBonus = true;
+                        bonuses.add(bonus);
+                        objectReference = bonus;
+                    }else if(name.endsWith("Jump")){
+                        shape = ShapeFactory.createCircle(obj);
+                        fdef.isSensor = true;
+                        BonusJump bonus = new BonusJump(obj.getEllipse().x,obj.getEllipse().y);
+                        isBonus = true;
+                        bonuses.add(bonus);
+                        objectReference = bonus;
+                    }
                 }
             }else if(object instanceof RectangleMapObject){
                 RectangleMapObject obj = (RectangleMapObject)object;
@@ -80,7 +110,9 @@ public class Level {
             fdef.density = 1;
             fdef.shape = shape;
             Fixture fixture = body.createFixture(fdef);
-            fixture.setUserData(name);
+            fixture.setUserData(objectReference == null ? name : objectReference);
+            if (isBonus)
+                bonuses.getLast().setBody(body);
             shape.dispose();
         }
 
@@ -89,6 +121,10 @@ public class Level {
 
     public ArrayList<Vector2> getEnemyCoordinates(){
         return this.enemyCoordinates;
+    }
+
+    public LinkedList<Bonus> getBonuses(){
+        return this.bonuses;
     }
 
 
