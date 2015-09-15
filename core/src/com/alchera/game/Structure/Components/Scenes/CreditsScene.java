@@ -46,7 +46,7 @@ public class CreditsScene extends Scene {
                 "Vasil Nedyalkov",
                 "Boyan Blagiev",
                 "Galya Georgieva",
-                "Zdravko Bîtushanov"
+                "Zdravko Botushanov"
         };
         weasel = new Texture("sprites/weaselCredits.png");
 

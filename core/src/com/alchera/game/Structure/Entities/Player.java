@@ -21,7 +21,7 @@ public class Player implements Disposable{
     private Body body;
     private Fixture groundTrigger;
     private int lives;
-    private int health;
+    private int health = 3;
     //private float mana;
     private float elapsedTime;
     private boolean isIdle;

@@ -2,6 +2,10 @@ package com.alchera.game.Structure.Components.Scenes;
 
 import com.alchera.game.Alchera;
 import com.alchera.game.Structure.Components.Camera.CustomCamera;
+import com.alchera.game.Structure.Components.Overlays.Hud;
+import com.alchera.game.Structure.Entities.Bonuses.BonusHealth;
+import com.alchera.game.Structure.Entities.Bonuses.BonusLife;
+import com.alchera.game.Structure.Entities.Bonuses.BonusSpeed;
 import com.alchera.game.Structure.Entities.Enemys.Enemy;
 import com.alchera.game.Structure.Entities.Player;
 import com.alchera.game.Structure.Levels.Level;
@@ -9,6 +13,7 @@ import com.alchera.game.Structure.Listeners.ContactHandler;
 import com.alchera.game.Structure.Managers.SceneManager;
 import com.alchera.game.Structure.Utils.BodyFactory;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -28,7 +33,7 @@ public class GameplayScene extends Scene {
     Box2DDebugRenderer boxRenderer;
     Player player;
     ArrayList<Enemy> enemies;
-    Enemy enemy;
+    Hud hud;
     World boxWorld;
     Level level;
 
@@ -45,6 +50,7 @@ public class GameplayScene extends Scene {
         boxWorld = new World(new Vector2(0, -18), true);
         level = new Level(batch,boxWorld);
         player = new Player(boxWorld,level.playerSpawn.x,level.playerSpawn.y);
+        hud = new Hud(manager,player);
         for(Vector2 vec : level.getEnemyCoordinates()){
 
             enemies.add(new Enemy(boxWorld,player,"sprites/bosssheet.txt",(int)vec.x,(int)vec.y,"attack0","walk",9,"attack",2));
@@ -75,6 +81,7 @@ public class GameplayScene extends Scene {
         for (Enemy enemy : enemies){
             enemy.render(batch);
         }
+        hud.render();
         // Draw ends here.
         batch.end();
 
@@ -98,6 +105,21 @@ public class GameplayScene extends Scene {
         camera.update();
         b2dcamera.update();
         batch.setProjectionMatrix(this.camera.combined);
+        hud.update(delta);
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.R)){
+            hud.getBonusField().addBonus(new BonusHealth(new Vector2(0,0)));
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.T)){
+            hud.getBonusField().addBonus(new BonusSpeed(new Vector2(0,0)));
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.Z)){
+            if (hud.isVisible())
+                hud.hide();
+            else
+                hud.show();
+        }
     }
 
     @Override
