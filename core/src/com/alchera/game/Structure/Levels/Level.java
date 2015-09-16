@@ -7,6 +7,8 @@ import com.alchera.game.Structure.Entities.Bonuses.BonusSpeed;
 import com.alchera.game.Structure.Utils.ShapeFactory;
 import com.alchera.game.Structure.Utils.Variables;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
@@ -27,6 +29,8 @@ import java.util.LinkedList;
  */
 public class Level {
 
+    Texture backgroundTxt;
+    SpriteBatch batch;
     private TiledMap map;
     private OrthogonalTiledMapRenderer renderer;
     public Vector2 playerSpawn = new Vector2(0,0);
@@ -35,13 +39,19 @@ public class Level {
 
 
     public Level(SpriteBatch batch,World world){
+        this.batch = batch;
         map = new TmxMapLoader().load("map1.tmx");
         renderer = new OrthogonalTiledMapRenderer(map,batch);
         parseObjectLayer(world,map.getLayers().get("bounds").getObjects());
+        backgroundTxt = new Texture("background.png");
     }
 
 
     public void render(OrthographicCamera camera){
+
+        batch.begin();
+        batch.draw(backgroundTxt,-400,0);
+        batch.end();
         renderer.setView(camera);
         renderer.render();
     }

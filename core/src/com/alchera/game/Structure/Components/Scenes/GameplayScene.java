@@ -13,9 +13,12 @@ import com.alchera.game.Structure.Levels.Level;
 import com.alchera.game.Structure.Listeners.ContactHandler;
 import com.alchera.game.Structure.Managers.SceneManager;
 import com.alchera.game.Structure.Utils.BodyFactory;
+import com.alchera.game.Structure.Utils.EnemyFactory;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 
@@ -40,11 +43,14 @@ public class GameplayScene extends Scene {
     World boxWorld;
     Level level;
 
+
     public GameplayScene(SceneManager sm){
         super(sm);
     }
     @Override
     protected void create(){
+
+
         // Create a box2d world to simulate all physics
         enemies = new ArrayList<Enemy>();
 
@@ -57,18 +63,21 @@ public class GameplayScene extends Scene {
         player = new Player(boxWorld,level.playerSpawn.x,level.playerSpawn.y);
         hud = new Hud(manager,player);
         for(Vector2 vec : level.getEnemyCoordinates()){
-
-            enemies.add(new Enemy(boxWorld,player,"sprites/bosssheet.txt",(int)vec.x,(int)vec.y,"attack0","walk",9,"attack",2));
-
+            try {
+                Enemy enemy = EnemyFactory.createRandomEnemy(player,boxWorld,(int)vec.x,(int)vec.y);
+                enemies.add(enemy);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         contactHandler = new ContactHandler(player);
         boxWorld.setContactListener(contactHandler);
         // Camera for the game world
         camera = new CustomCamera(player);
-        camera.setToOrtho(false, Alchera.WIDTH, Alchera.HEIGHT);
+        camera.setToOrtho(false, (Alchera.WIDTH - 500), (Alchera.HEIGHT - 200));
         b2dcamera = new CustomCamera(player);
         b2dcamera.setToOrtho(false, Alchera.WIDTH / PPM, Alchera.HEIGHT / PPM);
-        b2dcamera.isBox2DCamera(true);
+        b2dcamera.isBox2DCamera(false);
         // Debug renderer to see a representation of what happens in the Box2D world.
         boxRenderer = new Box2DDebugRenderer();
     }
