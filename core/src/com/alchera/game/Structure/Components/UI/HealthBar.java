@@ -6,6 +6,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 /**
@@ -39,6 +40,16 @@ public class HealthBar extends BaseUIComponent {
     @Override
     public void update(float delta) {
         // Can be used for smooth transition between visible and not or other logic, in this case it's not needed
+    }
+
+    @Override
+    public void setAlpha(float value) {
+        heart.setAlpha(MathUtils.clamp(value,0,1));
+    }
+
+    @Override
+    public float getAlpha() {
+        return this.heart.getColor().a;
     }
 
     public void setPosition(Vector2 pos) {

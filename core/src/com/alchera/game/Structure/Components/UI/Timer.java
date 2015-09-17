@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeType;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.TimeUtils;
 
@@ -33,7 +34,6 @@ public class Timer extends BaseUIComponent {
         this.isVisible = true;
 
         font = generator.generateFont(parameters);
-
         startTime = System.currentTimeMillis();
 
     }
@@ -49,5 +49,16 @@ public class Timer extends BaseUIComponent {
         long current = TimeUtils.timeSinceMillis(startTime);
         seconds = (current / 1000) % 60;
         minutes = (current / (1000 * 60)) % 60;
+    }
+
+    @Override
+    public void setAlpha(float value) {
+        Color clr = font.getColor();
+        this.font.setColor(clr.r,clr.g,clr.b, MathUtils.clamp(value,0,1));
+    }
+
+    @Override
+    public float getAlpha() {
+        return font.getColor().a;
     }
 }

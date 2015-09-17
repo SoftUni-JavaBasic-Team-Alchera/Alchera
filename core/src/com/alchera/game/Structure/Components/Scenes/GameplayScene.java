@@ -19,7 +19,9 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
 
 import java.util.ArrayList;
@@ -34,14 +36,16 @@ public class GameplayScene extends Scene {
 
     ContactHandler contactHandler;
     CustomCamera camera;
-    CustomCamera b2dcamera;
-    Box2DDebugRenderer boxRenderer;
+    //CustomCamera b2dcamera;
+    //Box2DDebugRenderer boxRenderer;
     Player player;
     ArrayList<Enemy> enemies;
     LinkedList<Bonus> bonuses;
     Hud hud;
     World boxWorld;
     Level level;
+
+    final float scale = 0.75f;
 
 
     public GameplayScene(SceneManager sm){
@@ -50,12 +54,7 @@ public class GameplayScene extends Scene {
     @Override
     protected void create(){
 
-
-        // Create a box2d world to simulate all physics
         enemies = new ArrayList<Enemy>();
-
-
-
         boxWorld = new World(new Vector2(0, -18), true);
 
         level = new Level(batch,boxWorld);
@@ -74,12 +73,20 @@ public class GameplayScene extends Scene {
         boxWorld.setContactListener(contactHandler);
         // Camera for the game world
         camera = new CustomCamera(player);
-        camera.setToOrtho(false, (Alchera.WIDTH - 500), (Alchera.HEIGHT - 200));
+        camera.setToOrtho(false, Alchera.WIDTH, Alchera.HEIGHT);
+        camera.zoom = scale;
+        camera.setMinPosition(new Vector2(Alchera.WIDTH * scale / 2f,  Alchera.HEIGHT * scale / 2f));
+        camera.setMaxPosition(new Vector2(level.size.x - (Alchera.WIDTH * scale/2f),level.size.y - (Alchera.HEIGHT * scale /2f)));
+        camera.setPosition(new Vector3(player.getWorldX(), player.getWorldY(), 0));
+
+        Gdx.app.log("Shader:", batch.getShader().getVertexShaderSource());
+/*
         b2dcamera = new CustomCamera(player);
         b2dcamera.setToOrtho(false, Alchera.WIDTH / PPM, Alchera.HEIGHT / PPM);
-        b2dcamera.isBox2DCamera(false);
+        b2dcamera.zoom = scale;
+        b2dcamera.isBox2DCamera(true);
         // Debug renderer to see a representation of what happens in the Box2D world.
-        boxRenderer = new Box2DDebugRenderer();
+        boxRenderer = new Box2DDebugRenderer();*/
     }
 
     @Override
@@ -105,8 +112,10 @@ public class GameplayScene extends Scene {
 
 
         // Draw the Box2D world.
-        boxRenderer.render(boxWorld, b2dcamera.combined);
+        //boxRenderer.render(boxWorld, b2dcamera.combined);
     }
+
+    ArrayList<Bonus> toRemove = new ArrayList<Bonus>(10);
 
     @Override
     public void update(float delta) {
@@ -114,24 +123,31 @@ public class GameplayScene extends Scene {
         boxWorld.step(delta, 8, 2);
         // Update player logic
         player.update(delta);
+        Gdx.app.log("Player position:",String.format("X:%s Y:%s",player.getWorldX(),player.getWorldY()));
         for (Enemy enemy : enemies){
             enemy.update(delta);
         }
+
         for (Bonus bonus : bonuses){
             if (bonus.isActivated()){
                 if (!(bonus instanceof BonusHealth))
                     hud.getBonusField().addBonus(bonus);
                 boxWorld.destroyBody(bonus.getBody());
-                bonuses.remove(bonus);
+                toRemove.add(bonus);
                 continue;
             }
 
             bonus.update(delta);
         }
 
+        for(Bonus bonus : toRemove){
+            bonuses.remove(bonus);
+        }
+        toRemove.clear();
+
         // update both camera positions
         camera.update();
-        b2dcamera.update();
+        //b2dcamera.update();
         batch.setProjectionMatrix(this.camera.combined);
         hud.update(delta);
 
@@ -153,6 +169,6 @@ public class GameplayScene extends Scene {
     @Override
     public void dispose() {
         player.dispose();
-        boxRenderer.dispose();
+        //boxRenderer.dispose();
     }
 }

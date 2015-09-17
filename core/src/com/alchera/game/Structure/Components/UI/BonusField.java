@@ -1,7 +1,9 @@
 package com.alchera.game.Structure.Components.UI;
 
 import com.alchera.game.Structure.Entities.Bonuses.Bonus;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.LinkedList;
@@ -13,6 +15,7 @@ public class BonusField extends BaseUIComponent {
 
     private LinkedList<Bonus> bonuses;
     private float x,y;
+    private float alpha = 1;
     private Vector2 startingPosition;
 
     public BonusField(Vector2 position){
@@ -30,6 +33,8 @@ public class BonusField extends BaseUIComponent {
     @Override
     public void render(SpriteBatch batch) {
         int counter = 0;
+        Color clr = batch.getColor().cpy();
+        batch.setColor(clr.r,clr.g,clr.b,alpha);
 
         for(Bonus bonus : bonuses){
             batch.draw(bonus.getSprite(), x, y,
@@ -50,7 +55,7 @@ public class BonusField extends BaseUIComponent {
         }
         x = startingPosition.x;
         y = startingPosition.y;
-
+        batch.setColor(clr);
     }
 
     @Override
@@ -62,6 +67,16 @@ public class BonusField extends BaseUIComponent {
                 bonus.update(delta);
             }
         }
+    }
+
+    @Override
+    public void setAlpha(float value) {
+        this.alpha = MathUtils.clamp(value,0,1);
+    }
+
+    @Override
+    public float getAlpha() {
+        return this.alpha;
     }
 
     public void addBonus(Bonus bonus){
