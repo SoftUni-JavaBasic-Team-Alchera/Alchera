@@ -4,6 +4,7 @@ import com.alchera.game.Structure.Entities.Enemys.Enemy;
 import com.alchera.game.Structure.Entities.Enemys.EnemyType;
 import com.alchera.game.Structure.Entities.Player;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.World;
 
 import java.util.Random;
@@ -31,8 +32,7 @@ public class EnemyFactory {
     }
 
     public static Enemy createRandomEnemy(Player player, World boxWorld, int X, int Y) throws Exception {
-        Random rn = new Random();
-        int result=rn.nextInt(3);
+        int result = MathUtils.random(3);
 
         switch (result) {
             case 0:

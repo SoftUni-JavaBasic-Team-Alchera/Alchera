@@ -55,7 +55,7 @@ public class SceneManager {
             case MAINMENU:
                 return new MainMenu(this);
             case GAMEPLAY:
-                return new GameplayScene(this);
+                return new GameplaySceneTest(this);
             case CREDITS:
                 return new CreditsScene(this);
 

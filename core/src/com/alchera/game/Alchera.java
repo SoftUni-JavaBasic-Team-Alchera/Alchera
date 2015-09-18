@@ -5,6 +5,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 
 public class Alchera extends ApplicationAdapter {
 
@@ -17,14 +18,26 @@ public class Alchera extends ApplicationAdapter {
 
 	@Override
 	public void create () {
-        // Camera for the game world
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, Alchera.WIDTH,Alchera.HEIGHT);
-        // Set the default background color.
-        Gdx.gl.glClearColor(0, 0, 0f, 1);
-        batch = new SpriteBatch();
-        batch.setProjectionMatrix(camera.combined);
-        sceneManager = new SceneManager(this);
+
+
+
+		// Camera for the game world
+		camera = new OrthographicCamera();
+		camera.setToOrtho(false, Alchera.WIDTH,Alchera.HEIGHT);
+		// Set the default background color.
+		Gdx.gl.glClearColor(0, 0, 0f, 1);
+		batch = new SpriteBatch();
+		batch.setProjectionMatrix(camera.combined);
+
+		ShaderProgram shader = new ShaderProgram(Gdx.files.internal("shaders/basic.vert"),Gdx.files.internal("shaders/basic.frag"));
+		if (!shader.isCompiled())
+			System.err.println(shader.getLog());
+		shader.begin();
+		shader.setUniformf("u_fade",1f);
+		shader.end();
+		batch.setShader(shader);
+
+		sceneManager = new SceneManager(this);
     }
 
 	@Override

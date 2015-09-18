@@ -5,29 +5,26 @@ import com.alchera.game.Structure.Components.Camera.CustomCamera;
 import com.alchera.game.Structure.Components.Overlays.Hud;
 import com.alchera.game.Structure.Entities.Bonuses.Bonus;
 import com.alchera.game.Structure.Entities.Bonuses.BonusHealth;
-import com.alchera.game.Structure.Entities.Bonuses.BonusLife;
 import com.alchera.game.Structure.Entities.Bonuses.BonusSpeed;
 import com.alchera.game.Structure.Entities.Enemys.Enemy;
 import com.alchera.game.Structure.Entities.Player;
 import com.alchera.game.Structure.Levels.Level;
 import com.alchera.game.Structure.Listeners.ContactHandler;
 import com.alchera.game.Structure.Managers.SceneManager;
-import com.alchera.game.Structure.Utils.BodyFactory;
 import com.alchera.game.Structure.Utils.EnemyFactory;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-
-import static com.alchera.game.Structure.Utils.Variables.PPM;
 
 /**
  * Created by Inspix on 10/09/2015.
@@ -44,7 +41,6 @@ public class GameplayScene extends Scene {
     Hud hud;
     World boxWorld;
     Level level;
-
     final float scale = 0.75f;
 
 
@@ -53,7 +49,6 @@ public class GameplayScene extends Scene {
     }
     @Override
     protected void create(){
-
         enemies = new ArrayList<Enemy>();
         boxWorld = new World(new Vector2(0, -18), true);
 
@@ -79,7 +74,7 @@ public class GameplayScene extends Scene {
         camera.setMaxPosition(new Vector2(level.size.x - (Alchera.WIDTH * scale/2f),level.size.y - (Alchera.HEIGHT * scale /2f)));
         camera.setPosition(new Vector3(player.getWorldX(), player.getWorldY(), 0));
 
-        Gdx.app.log("Shader:", batch.getShader().getVertexShaderSource());
+        Gdx.app.log("Shader:", batch.getShader().getFragmentShaderSource());
 /*
         b2dcamera = new CustomCamera(player);
         b2dcamera.setToOrtho(false, Alchera.WIDTH / PPM, Alchera.HEIGHT / PPM);
@@ -91,10 +86,7 @@ public class GameplayScene extends Scene {
 
     @Override
     public void render() {
-
-        // Clear the color buffer.
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        // Draw begins here.
         level.render(camera);
         batch.begin();
         // Draw the player.
@@ -108,13 +100,9 @@ public class GameplayScene extends Scene {
         hud.render();
         // Draw ends here.
         batch.end();
-
-
-
         // Draw the Box2D world.
         //boxRenderer.render(boxWorld, b2dcamera.combined);
     }
-
     ArrayList<Bonus> toRemove = new ArrayList<Bonus>(10);
 
     @Override
@@ -123,7 +111,6 @@ public class GameplayScene extends Scene {
         boxWorld.step(delta, 8, 2);
         // Update player logic
         player.update(delta);
-        Gdx.app.log("Player position:",String.format("X:%s Y:%s",player.getWorldX(),player.getWorldY()));
         for (Enemy enemy : enemies){
             enemy.update(delta);
         }
@@ -150,13 +137,6 @@ public class GameplayScene extends Scene {
         //b2dcamera.update();
         batch.setProjectionMatrix(this.camera.combined);
         hud.update(delta);
-
-        if (Gdx.input.isKeyJustPressed(Input.Keys.R)){
-            hud.getBonusField().addBonus(new BonusHealth(new Vector2(0,0)));
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.T)){
-            hud.getBonusField().addBonus(new BonusSpeed(new Vector2(0,0)));
-        }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.Z)){
             if (hud.isVisible())

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" renderorder="right-down" width="30" height="15" tilewidth="70" tileheight="70" nextobjectid="74">
  <tileset firstgid="1" name="set" tilewidth="70" tileheight="70" spacing="2" tilecount="156">
-  <image source="dsprites/mapsheet.png" width="914" height="936"/>
+  <image source="sprites/mapsheet.png" width="914" height="936"/>
  </tileset>
  <layer name="Ground" width="30" height="15">
   <data encoding="base64" compression="zlib">
