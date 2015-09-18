@@ -6,12 +6,15 @@ import com.alchera.game.Structure.Components.Overlays.Hud;
 import com.alchera.game.Structure.Entities.Bonuses.Bonus;
 import com.alchera.game.Structure.Entities.Bonuses.BonusHealth;
 import com.alchera.game.Structure.Entities.Player;
-import com.alchera.game.Structure.Entities.Traps.BaseTrap;
-import com.alchera.game.Structure.Entities.Traps.SawBlade;
+import com.alchera.game.Structure.Entities.Traps.*;
 import com.alchera.game.Structure.Levels.Level;
 import com.alchera.game.Structure.Listeners.ContactHandler;
 import com.alchera.game.Structure.Managers.SceneManager;
+
+import static com.alchera.game.Structure.Utils.TrapFactory.createTrap;
 import static com.alchera.game.Structure.Utils.Variables.*;
+
+import com.alchera.game.Structure.Utils.TrapFactory;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
@@ -103,7 +106,7 @@ public class GameplaySceneTest extends Scene {
         boxWorld.setContactListener(contactHandler);
 
         for(Vector2 position : level.getTraps()){
-            this.traps.add(new SawBlade(boxWorld,position.x,position.y));
+            this.traps.add(TrapFactory.createRandomTrap(boxWorld,position.x,position.y));
         }
 
 

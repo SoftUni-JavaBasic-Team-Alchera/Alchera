@@ -1,4 +1,4 @@
-package com.alchera.game.Deprecated.Enemys;
+package com.alchera.game.Structure.Entities.Enemys;
 
 /**
  * Created by Administrator on 9/16/2015.

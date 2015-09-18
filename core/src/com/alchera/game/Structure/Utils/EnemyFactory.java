@@ -1,7 +1,7 @@
 package com.alchera.game.Structure.Utils;
 
-import com.alchera.game.Deprecated.Enemys.Enemy;
-import com.alchera.game.Deprecated.Enemys.EnemyType;
+import com.alchera.game.Structure.Entities.Enemys.Enemy;
+import com.alchera.game.Structure.Entities.Enemys.EnemyType;
 import com.alchera.game.Structure.Entities.Player;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.World;

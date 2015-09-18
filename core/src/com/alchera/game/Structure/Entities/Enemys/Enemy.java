@@ -1,4 +1,4 @@
-package com.alchera.game.Deprecated.Enemys;
+package com.alchera.game.Structure.Entities.Enemys;
 
 import com.alchera.game.Structure.Entities.Player;
 import com.alchera.game.Structure.Utils.AssetUtils;
