@@ -36,7 +36,6 @@ public class Level {
     private TiledMap map;
     private OrthogonalTiledMapRenderer renderer;
     public Vector2 playerSpawn = new Vector2(0,0);
-    private ArrayList<Vector2> enemyCoordinates = new ArrayList<Vector2>();;
     private LinkedList<Bonus> bonuses = new LinkedList<Bonus>();
 
 
@@ -76,8 +75,6 @@ public class Level {
                 name = obj.getName();
                 if (name.equals("playerspawn"))
                     playerSpawn.set(obj.getEllipse().x, obj.getEllipse().y);
-                else if (name.equals("enemy"))
-                    enemyCoordinates.add(new Vector2(obj.getEllipse().x,obj.getEllipse().y));
                 else if (name.equals("exit")){
                     shape = ShapeFactory.createCircle(obj);
                     fdef.isSensor = true;
@@ -142,10 +139,6 @@ public class Level {
         int tileHeight = properties.get("tileheight",Integer.class);
 
         return new Vector2(tilesX * tileWidth,tilesY * tileHeight);
-    }
-
-    public ArrayList<Vector2> getEnemyCoordinates(){
-        return this.enemyCoordinates;
     }
 
     public LinkedList<Bonus> getBonuses(){

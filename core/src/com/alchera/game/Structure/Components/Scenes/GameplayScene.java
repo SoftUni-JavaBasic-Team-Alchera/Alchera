@@ -5,20 +5,13 @@ import com.alchera.game.Structure.Components.Camera.CustomCamera;
 import com.alchera.game.Structure.Components.Overlays.Hud;
 import com.alchera.game.Structure.Entities.Bonuses.Bonus;
 import com.alchera.game.Structure.Entities.Bonuses.BonusHealth;
-import com.alchera.game.Structure.Entities.Bonuses.BonusSpeed;
-import com.alchera.game.Structure.Entities.Enemys.Enemy;
 import com.alchera.game.Structure.Entities.Player;
 import com.alchera.game.Structure.Levels.Level;
 import com.alchera.game.Structure.Listeners.ContactHandler;
 import com.alchera.game.Structure.Managers.SceneManager;
-import com.alchera.game.Structure.Utils.EnemyFactory;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
@@ -36,7 +29,6 @@ public class GameplayScene extends Scene {
     //CustomCamera b2dcamera;
     //Box2DDebugRenderer boxRenderer;
     Player player;
-    ArrayList<Enemy> enemies;
     LinkedList<Bonus> bonuses;
     Hud hud;
     World boxWorld;
@@ -49,21 +41,12 @@ public class GameplayScene extends Scene {
     }
     @Override
     protected void create(){
-        enemies = new ArrayList<Enemy>();
         boxWorld = new World(new Vector2(0, -18), true);
 
         level = new Level(batch,boxWorld);
         bonuses = level.getBonuses();
         player = new Player(boxWorld,level.playerSpawn.x,level.playerSpawn.y);
         hud = new Hud(manager,player);
-        for(Vector2 vec : level.getEnemyCoordinates()){
-            try {
-                Enemy enemy = EnemyFactory.createRandomEnemy(player,boxWorld,(int)vec.x,(int)vec.y);
-                enemies.add(enemy);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
         contactHandler = new ContactHandler(player);
         boxWorld.setContactListener(contactHandler);
         // Camera for the game world
@@ -91,9 +74,6 @@ public class GameplayScene extends Scene {
         batch.begin();
         // Draw the player.
         player.render(batch);
-        for (Enemy enemy : enemies){
-            enemy.render(batch);
-        }
         for (Bonus bonus : bonuses){
             bonus.render(batch);
         }
@@ -111,10 +91,6 @@ public class GameplayScene extends Scene {
         boxWorld.step(delta, 8, 2);
         // Update player logic
         player.update(delta);
-        for (Enemy enemy : enemies){
-            enemy.update(delta);
-        }
-
         for (Bonus bonus : bonuses){
             if (bonus.isActivated()){
                 if (!(bonus instanceof BonusHealth))

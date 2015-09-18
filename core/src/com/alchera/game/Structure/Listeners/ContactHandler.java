@@ -1,7 +1,6 @@
 package com.alchera.game.Structure.Listeners;
 
 import com.alchera.game.Structure.Entities.Bonuses.Bonus;
-import com.alchera.game.Structure.Entities.Enemys.Enemy;
 import com.alchera.game.Structure.Entities.Player;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.physics.box2d.*;
@@ -21,7 +20,7 @@ public class ContactHandler implements ContactListener {
         Fixture b = contact.getFixtureB();
 
         if (isGroundTrigger(a,b)){
-            if(!isEnemy(b) && !isBonus(b))
+            if(!isBonus(b))
             {
                 player.setGrounded(true);
             }
@@ -44,7 +43,7 @@ public class ContactHandler implements ContactListener {
         Fixture b = contact.getFixtureB();
 
         if (isGroundTrigger(a, b)){
-            if(!isEnemy(b) && !isBonus(b))
+            if(!isBonus(b))
             {
                 player.setGrounded(false);
             }
@@ -66,10 +65,6 @@ public class ContactHandler implements ContactListener {
 
     private boolean isGroundTrigger(Fixture a, Fixture b){
         return a == player.getGroundTrigger() || b == player.getGroundTrigger();
-    }
-
-    private boolean isEnemy(Fixture b){
-        return b.getBody().getUserData() != null && b.getBody().getUserData() instanceof Enemy;
     }
 
     private boolean isExit(Fixture b){

@@ -1,12 +1,10 @@
-package com.alchera.game.Structure.Entities.Enemys;
+package com.alchera.game.Deprecated.Enemys;
 
 import com.alchera.game.Structure.Entities.Player;
 import com.alchera.game.Structure.Utils.AssetUtils;
 import com.alchera.game.Structure.Utils.BodyFactory;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 
