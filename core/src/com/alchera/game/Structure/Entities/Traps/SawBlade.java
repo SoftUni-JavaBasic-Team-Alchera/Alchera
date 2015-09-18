@@ -20,6 +20,7 @@ public class SawBlade extends BaseTrap {
         this.isStatic = true;
         this.body = BodyFactory.createStaticCircle(world,sprite.getWidth()/2f,x,y);
         this.fixture = body.getFixtureList().get(0);
+        this.fixture.setUserData(this);
         this.rotation = 100f;
     }
 

@@ -2,6 +2,7 @@ package com.alchera.game.Structure.Listeners;
 
 import com.alchera.game.Structure.Entities.Bonuses.Bonus;
 import com.alchera.game.Structure.Entities.Player;
+import com.alchera.game.Structure.Entities.Traps.BaseTrap;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.physics.box2d.*;
 
@@ -32,9 +33,17 @@ public class ContactHandler implements ContactListener {
             bonus.activate(player);
         }
 
+        if (player.getBody().getFixtureList().get(0) == a && isTrap(b)){
+            player.isDying(true);
+        }
+
         if(isExit(b)){
             Gdx.app.exit();
         }
+    }
+
+    private boolean isTrap(Fixture b) {
+        return b.getUserData() != null && b.getUserData() instanceof BaseTrap;
     }
 
     @Override
