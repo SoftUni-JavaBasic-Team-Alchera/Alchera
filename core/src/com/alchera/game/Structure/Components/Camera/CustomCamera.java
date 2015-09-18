@@ -16,6 +16,7 @@ public class CustomCamera extends OrthographicCamera {
     private Vector2 min = new Vector2(),max = new Vector2();
     private Player player;
     private boolean isBox2D;
+    private boolean isLimited;
     public CustomCamera(Player player) {
         super();
         this.player = player;
@@ -38,7 +39,7 @@ public class CustomCamera extends OrthographicCamera {
     }
 
     public void setPosition(Vector3 position){
-        if (isBox2D)
+        if (isBox2D || !isLimited)
             this.position.set(position);
         else
             this.position.set(MathUtils.clamp(position.x,min.x,max.x),MathUtils.clamp(position.y,min.y,max.y),position.z);
@@ -50,6 +51,14 @@ public class CustomCamera extends OrthographicCamera {
 
     public void setMaxPosition(Vector2 max){
         this.max = max;
+    }
+
+    public void setLimited(boolean limit){
+        this.isLimited = limit;
+    }
+
+    public boolean isLimited(){
+        return this.isLimited;
     }
 
 

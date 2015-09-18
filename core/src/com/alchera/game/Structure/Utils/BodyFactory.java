@@ -27,6 +27,15 @@ public class BodyFactory {
         return result;
     }
 
+    public static Body createStaticCircle(World world, float radius, float x, float y){
+        CircleShape circle = new CircleShape();
+        circle.setRadius(radius / PPM);
+
+        Body result = createBody(world,circle,x + radius,y + radius,1,0,false, BodyDef.BodyType.StaticBody);
+        circle.dispose();
+        return result;
+    }
+
     private static Body createBody(World world, Shape shape, float x, float y, float density, float friction, boolean fixedangle, BodyDef.BodyType type){
         BodyDef bdef = new BodyDef();
         bdef.type = type;

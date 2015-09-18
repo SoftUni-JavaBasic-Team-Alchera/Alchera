@@ -6,9 +6,12 @@ import com.alchera.game.Structure.Components.Overlays.Hud;
 import com.alchera.game.Structure.Entities.Bonuses.Bonus;
 import com.alchera.game.Structure.Entities.Bonuses.BonusHealth;
 import com.alchera.game.Structure.Entities.Player;
+import com.alchera.game.Structure.Entities.Traps.BaseTrap;
+import com.alchera.game.Structure.Entities.Traps.SawBlade;
 import com.alchera.game.Structure.Levels.Level;
 import com.alchera.game.Structure.Listeners.ContactHandler;
 import com.alchera.game.Structure.Managers.SceneManager;
+import static com.alchera.game.Structure.Utils.Variables.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
@@ -21,6 +24,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 
 import java.util.ArrayList;
@@ -39,10 +43,11 @@ public class GameplaySceneTest extends Scene {
     ShaderProgram defaultShader;
     ContactHandler contactHandler;
     CustomCamera camera;
-    //CustomCamera b2dcamera;
-    //Box2DDebugRenderer boxRenderer;
+    CustomCamera b2dcamera;
+    Box2DDebugRenderer boxRenderer;
     Player player;
     LinkedList<Bonus> bonuses;
+    ArrayList<BaseTrap> traps;
     Hud hud;
     World boxWorld;
     Level level;
@@ -61,6 +66,7 @@ public class GameplaySceneTest extends Scene {
         fade = 1f;
         blurRadius = 0f;
         isBlurred = false;
+        traps = new ArrayList<BaseTrap>();
 
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/bodoni.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
@@ -95,21 +101,27 @@ public class GameplaySceneTest extends Scene {
         hud = new Hud(manager,player);
         contactHandler = new ContactHandler(player);
         boxWorld.setContactListener(contactHandler);
+
+        for(Vector2 position : level.getTraps()){
+            this.traps.add(new SawBlade(boxWorld,position.x,position.y));
+        }
+
+
         // Camera for the game world
         camera = new CustomCamera(player);
         camera.setToOrtho(false, Alchera.WIDTH, Alchera.HEIGHT);
         camera.zoom = scale;
+        camera.setLimited(false);
         camera.setMinPosition(new Vector2(Alchera.WIDTH * scale / 2f, Alchera.HEIGHT * scale / 2f));
         camera.setMaxPosition(new Vector2(level.size.x - (Alchera.WIDTH * scale / 2f), level.size.y - (Alchera.HEIGHT * scale / 2f)));
         camera.setPosition(new Vector3(player.getWorldX(), player.getWorldY(), 0));
 
-/*
         b2dcamera = new CustomCamera(player);
         b2dcamera.setToOrtho(false, Alchera.WIDTH / PPM, Alchera.HEIGHT / PPM);
         b2dcamera.zoom = scale;
         b2dcamera.isBox2DCamera(true);
         // Debug renderer to see a representation of what happens in the Box2D world.
-        boxRenderer = new Box2DDebugRenderer();*/
+        boxRenderer = new Box2DDebugRenderer();
     }
 
     @Override
@@ -131,11 +143,15 @@ public class GameplaySceneTest extends Scene {
         for (Bonus bonus : bonuses){
             bonus.render(batch);
         }
+
+        for (BaseTrap trap : traps){
+            trap.render(batch);
+        }
         hud.render();
         // Draw ends here.
         batch.end();
         // Draw the Box2D world.
-        //boxRenderer.render(boxWorld, b2dcamera.combined);
+        boxRenderer.render(boxWorld, b2dcamera.combined);
     }
 
     private void renderBlur(){
@@ -147,6 +163,9 @@ public class GameplaySceneTest extends Scene {
         player.render(batch);
         for (Bonus bonus : bonuses){
             bonus.render(batch);
+        }
+        for (BaseTrap trap : traps){
+            trap.render(batch);
         }
         hud.render();
         // Draw ends here.
@@ -208,6 +227,9 @@ public class GameplaySceneTest extends Scene {
             bonus.update(delta);
         }
 
+        for (BaseTrap trap : traps){
+            trap.update(delta);
+        }
         for(Bonus bonus : toRemove){
             bonuses.remove(bonus);
         }
@@ -215,7 +237,7 @@ public class GameplaySceneTest extends Scene {
 
         // update both camera positions
         camera.update();
-        //b2dcamera.update();
+        b2dcamera.update();
         batch.setProjectionMatrix(this.camera.combined);
         hud.update(delta);
 
@@ -273,6 +295,6 @@ public class GameplaySceneTest extends Scene {
     @Override
     public void dispose() {
         player.dispose();
-        //boxRenderer.dispose();
+        boxRenderer.dispose();
     }
 }

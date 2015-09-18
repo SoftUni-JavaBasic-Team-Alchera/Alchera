@@ -4,6 +4,7 @@ import com.alchera.game.Structure.Entities.Bonuses.Bonus;
 import com.alchera.game.Structure.Entities.Bonuses.BonusHealth;
 import com.alchera.game.Structure.Entities.Bonuses.BonusJump;
 import com.alchera.game.Structure.Entities.Bonuses.BonusSpeed;
+import com.alchera.game.Structure.Entities.Traps.BaseTrap;
 import com.alchera.game.Structure.Utils.ShapeFactory;
 import com.alchera.game.Structure.Utils.Variables;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -36,6 +37,7 @@ public class Level {
     private TiledMap map;
     private OrthogonalTiledMapRenderer renderer;
     public Vector2 playerSpawn = new Vector2(0,0);
+    private ArrayList<Vector2> traps = new ArrayList<Vector2>();
     private LinkedList<Bonus> bonuses = new LinkedList<Bonus>();
 
 
@@ -44,7 +46,7 @@ public class Level {
         map = new TmxMapLoader().load("map1.tmx");
         size = parseSize();
         renderer = new OrthogonalTiledMapRenderer(map,batch);
-        parseObjectLayer(world,map.getLayers().get("bounds").getObjects());
+        parseObjectLayer(world, map.getLayers().get("bounds").getObjects());
         backgroundTxt = new Texture("background.png");
     }
 
@@ -78,6 +80,9 @@ public class Level {
                 else if (name.equals("exit")){
                     shape = ShapeFactory.createCircle(obj);
                     fdef.isSensor = true;
+                }else if (name.equals("enemy")){
+                    traps.add(new Vector2(obj.getEllipse().x,obj.getEllipse().y));
+                    fdef.isSensor = false;
                 }else if(name.startsWith("Bonus")){
                     if (name.endsWith("Speed")){
                         shape = ShapeFactory.createCircle(obj);
@@ -146,4 +151,7 @@ public class Level {
     }
 
 
+    public ArrayList<Vector2> getTraps() {
+        return traps;
+    }
 }
