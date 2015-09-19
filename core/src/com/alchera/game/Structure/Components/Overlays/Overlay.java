@@ -34,12 +34,14 @@ public abstract class Overlay implements Disposable{
         if (!isVisible)
             return;
         defaultCamera = batch.getProjectionMatrix();
+        batch.begin();
         batch.setProjectionMatrix(this.camera.combined);
         for(UIComponent component : components){
             if (component.isVisible()){
                 component.render(batch);
             }
         }
+        batch.end();
         batch.setProjectionMatrix(defaultCamera);
     }
 

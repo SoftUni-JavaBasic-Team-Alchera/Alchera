@@ -1,6 +1,5 @@
 package com.alchera.game.Structure.Entities;
 
-import com.alchera.game.Structure.Entities.Bonuses.BonusKey;
 import com.alchera.game.Structure.Utils.AssetUtils;
 import com.alchera.game.Structure.Utils.BodyFactory;
 import com.badlogic.gdx.Gdx;
@@ -34,7 +33,7 @@ public class Player implements Disposable{
 
     private boolean isFlipped;
     private boolean isDying;
-    private boolean stuck; // used to stuck the update loop for testing purposes
+    private boolean dead; // used to dead the update loop for testing purposes
 
     private Sprite idle;
     private TextureAtlas atlas;
@@ -50,14 +49,29 @@ public class Player implements Disposable{
     public Player(World world, float x, float y){
         atlas = new TextureAtlas(Gdx.files.internal("sprites/player.txt"));
         TextureAtlas.AtlasRegion region = atlas.findRegion("run0");
-        body = BodyFactory.CreateDynamicRectangle(world,region.getRegionWidth(),region.getRegionHeight(),x,y,0.2f,0);
+        idle = atlas.createSprite("run0");
+        body = this.reCreate(world, x, y);
+
+        isIdle = true;
+        run = AssetUtils.createFromAtlas(atlas, "run", 5, 1);
+        run.setPlayMode(Animation.PlayMode.LOOP);
+        death = AssetUtils.createFromAtlas(atlas,"death",5);
+        death.setPlayMode(Animation.PlayMode.NORMAL);
+        death.setFrameDuration(1f / 10f);
+        jump = AssetUtils.createFromAtlas(atlas,"jump",5);
+    }
+
+    public Body reCreate(World world,float x, float y) {
+        body = BodyFactory.CreateDynamicRectangle(world,idle.getRegionWidth(),idle.getRegionHeight(),x,y,0.2f,0);
         body.setUserData(this);
 
         FixtureDef fdef = new FixtureDef();
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(((region.getRegionWidth())/2)/PPM,8 / PPM, new Vector2((region.getRegionWidth()/2)/PPM,0),0);
+        shape.setAsBox(((idle.getRegionWidth()-2)/2)/PPM,4 / PPM, new Vector2((idle.getRegionWidth()/2)/PPM,0),0);
         fdef.shape = shape;
         fdef.isSensor = true;
+        isDying = false;
+        dead = false;
 
         groundTrigger = body.createFixture(fdef);
 
@@ -65,18 +79,12 @@ public class Player implements Disposable{
 
         keys = new boolean[3];
 
-        isIdle = true;
-        idle = atlas.createSprite("run0");
-        run = AssetUtils.createFromAtlas(atlas, "run", 5, 1);
-        run.setPlayMode(Animation.PlayMode.LOOP);
-        death = AssetUtils.createFromAtlas(atlas,"death",5);
-        death.setFrameDuration(1f / 10f);
-        jump = AssetUtils.createFromAtlas(atlas,"jump",5);
+        return body;
     }
 
     public void render(SpriteBatch batch){
         elapsedTime += Gdx.graphics.getDeltaTime();
-        if (stuck)
+        if (dead)
             return;
         if (isIdle)
         {
@@ -89,24 +97,29 @@ public class Player implements Disposable{
     }
 
     public void update(float delta) {
-        if (stuck)
+        if (dead){
+            this.body.setType(BodyDef.BodyType.StaticBody);
             return;
+        }
         if (isDying) {
+            isIdle = false;
             if (currentAnimation != death) {
                 currentAnimation = death;
                 elapsedTime = 0;
             }
             if (currentAnimation.isAnimationFinished(elapsedTime)){
-                stuck = true;
+                dead = true;
             }
             return;
         }
         Vector2 velocity = body.getLinearVelocity();
 
         // Handle jumping with flipping of the animation. Can jump only if there's a contact with the groundTrigger.
-        if (Gdx.input.isKeyJustPressed(Keys.SPACE) && isGrounded) {
-            body.applyForceToCenter(0, jumpForce * jumpMultiplier, true);
-            isGrounded = false;
+        if (Gdx.input.isKeyJustPressed(Keys.SPACE)) {
+            if (isGrounded){
+                body.applyForceToCenter(0, jumpForce * jumpMultiplier, true);
+                isGrounded = false;
+            }
             if (currentAnimation != jump) {
                 currentAnimation = jump;
                 elapsedTime = 0;
@@ -164,13 +177,22 @@ public class Player implements Disposable{
             case YELLOW:
                 this.keys[0] = true;
                 break;
-            case ORANGE:
+            case BLUE:
                 this.keys[1] = true;
                 break;
             case GREEN:
                 this.keys[2] = true;
                 break;
         }
+    }
+
+    public boolean hasKey(Lock.Type key){
+        switch (key){
+            case YELLOW: return this.keys[0];
+            case BLUE:   return this.keys[1];
+            case GREEN:  return this.keys[2];
+        }
+        return false;
     }
 
     public Fixture getGroundTrigger(){
@@ -247,7 +269,15 @@ public class Player implements Disposable{
     }
 
 
-    public void isDying(boolean dying) {
+    public void setDying(boolean dying) {
         this.isDying = dying;
+    }
+
+    public boolean isDying(){
+        return this.isDying;
+    }
+
+    public boolean isDead(){
+        return this.dead;
     }
 }

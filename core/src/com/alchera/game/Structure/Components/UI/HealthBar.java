@@ -18,14 +18,17 @@ public class HealthBar extends BaseUIComponent {
     private Sprite heart;
     private float scale;
 
-    public HealthBar(Player player){
+    public HealthBar(){
         this.heart = new Sprite(new Texture(Gdx.files.internal("sprites/bonusheart.png")));
-        this.player = player;
         this.isVisible = true;
         this.scale = 0.5f;
         this.heart.setScale(scale,scale);
         this.heart.setPosition(5, Alchera.HEIGHT - heart.getHeight() - 5);
 
+    }
+
+    public void setPlayer(Player player){
+        this.player = player;
     }
 
     @Override

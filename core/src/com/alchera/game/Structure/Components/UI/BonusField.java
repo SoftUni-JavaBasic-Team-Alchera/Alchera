@@ -34,9 +34,10 @@ public class BonusField extends BaseUIComponent {
     public void render(SpriteBatch batch) {
         int counter = 0;
         Color clr = batch.getColor().cpy();
-        batch.setColor(clr.r,clr.g,clr.b,alpha);
 
         for(Bonus bonus : bonuses){
+            Color spriteClr = bonus.getSprite().getColor();
+            batch.setColor(spriteClr.r,spriteClr.g,spriteClr.b,alpha);
             batch.draw(bonus.getSprite(), x, y,
                     bonus.getSprite().getOriginX(),
                     bonus.getSprite().getOriginY(),
@@ -81,5 +82,9 @@ public class BonusField extends BaseUIComponent {
 
     public void addBonus(Bonus bonus){
         this.bonuses.addLast(bonus);
+    }
+
+    public void clearBonuses(){
+        this.bonuses.clear();
     }
 }

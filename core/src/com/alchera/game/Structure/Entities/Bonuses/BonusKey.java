@@ -22,18 +22,19 @@ public class BonusKey extends Bonus {
     public BonusKey(Lock.Type type,Vector2 position) {
         super(position);
         this.type = type;
-        this.sprite = new Sprite(new Texture(Gdx.files.internal("sprites/bonusheart.png")));
+        this.sprite = new Sprite(new Texture(Gdx.files.internal("sprites/key.png")));
         switch (type){
             case GREEN:
                 sprite.setColor(Color.GREEN);
                 break;
-            case ORANGE:
-                sprite.setColor(Color.ORANGE);
+            case BLUE:
+                sprite.setColor(Color.BLUE);
                 break;
             case YELLOW:
                 sprite.setColor(Color.YELLOW);
                 break;
         }
+        this.sprite.setSize(defaultSize,defaultSize);
         this.sprite.setPosition(
                 this.position.x-(defaultSize/2)* sprite.getScaleX(),
                 this.position.y-(defaultSize/2)* sprite.getScaleY());

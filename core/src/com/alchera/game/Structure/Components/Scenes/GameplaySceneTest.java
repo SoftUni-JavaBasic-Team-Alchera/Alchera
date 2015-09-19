@@ -5,16 +5,14 @@ import com.alchera.game.Structure.Components.Camera.CustomCamera;
 import com.alchera.game.Structure.Components.Overlays.Hud;
 import com.alchera.game.Structure.Entities.Bonuses.Bonus;
 import com.alchera.game.Structure.Entities.Bonuses.BonusHealth;
+import com.alchera.game.Structure.Entities.Lock;
 import com.alchera.game.Structure.Entities.Player;
 import com.alchera.game.Structure.Entities.Traps.*;
 import com.alchera.game.Structure.Levels.Level;
 import com.alchera.game.Structure.Listeners.ContactHandler;
 import com.alchera.game.Structure.Managers.SceneManager;
-
-import static com.alchera.game.Structure.Utils.TrapFactory.createTrap;
 import static com.alchera.game.Structure.Utils.Variables.*;
 
-import com.alchera.game.Structure.Utils.TrapFactory;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
@@ -25,7 +23,6 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -51,7 +48,9 @@ public class GameplaySceneTest extends Scene {
     Box2DDebugRenderer boxRenderer;
     Player player;
     LinkedList<Bonus> bonuses;
+    LinkedList<Lock> locks;
     ArrayList<BaseTrap> traps;
+
     Hud hud;
     World boxWorld;
     Level level;
@@ -60,6 +59,8 @@ public class GameplaySceneTest extends Scene {
     boolean isBlurred;
     boolean grayscale = false;
     final float scale = 0.75f;
+    private boolean debug;
+    private boolean camLocked;
 
 
     public GameplaySceneTest(SceneManager sm){
@@ -70,7 +71,7 @@ public class GameplaySceneTest extends Scene {
         fade = 1f;
         blurRadius = 0f;
         isBlurred = false;
-
+        camLocked = true;
 
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/bodoni.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
@@ -80,7 +81,6 @@ public class GameplaySceneTest extends Scene {
         parameter.shadowOffsetX = 3;
         parameter.shadowOffsetY = 3;
         font = generator.generateFont(parameter);
-
 
         blur = new ShaderProgram(Gdx.files.internal("shaders/basic.vert"),Gdx.files.internal("shaders/blur.frag"));
         if (!blur.isCompiled())
@@ -97,22 +97,14 @@ public class GameplaySceneTest extends Scene {
 
         frameBufferA = new FrameBuffer(Pixmap.Format.RGBA8888,Gdx.graphics.getWidth(),Gdx.graphics.getHeight(),false,false);
         frameBufferB = new FrameBuffer(Pixmap.Format.RGBA8888,Gdx.graphics.getWidth(),Gdx.graphics.getHeight(),false,false);
-        boxWorld = new World(new Vector2(0, -18), true);
 
-        level = new Level(batch,boxWorld);
-
-        traps = level.getTraps();
-        bonuses = level.getBonuses();
-        player = new Player(boxWorld,level.playerSpawn.x,level.playerSpawn.y);
-        hud = new Hud(manager,player);
-        contactHandler = new ContactHandler(player);
-        boxWorld.setContactListener(contactHandler);
+        reLoadLevel();
 
         // Camera for the game world
         camera = new CustomCamera(player);
         camera.setToOrtho(false, Alchera.WIDTH, Alchera.HEIGHT);
         camera.zoom = scale;
-        camera.setLimited(false);
+        camera.setLimited(camLocked);
         camera.setMinPosition(new Vector2(Alchera.WIDTH * scale / 2f, Alchera.HEIGHT * scale / 2f));
         camera.setMaxPosition(new Vector2(level.size.x - (Alchera.WIDTH * scale / 2f), level.size.y - (Alchera.HEIGHT * scale / 2f)));
         camera.setPosition(new Vector3(player.getWorldX(), player.getWorldY(), 0));
@@ -121,6 +113,10 @@ public class GameplaySceneTest extends Scene {
         b2dcamera.setToOrtho(false, Alchera.WIDTH / PPM, Alchera.HEIGHT / PPM);
         b2dcamera.zoom = scale;
         b2dcamera.isBox2DCamera(true);
+        b2dcamera.setLimited(camLocked);
+        b2dcamera.setMinPosition(new Vector2((Alchera.WIDTH * scale / 2f) / PPM, (Alchera.HEIGHT * scale / 2f) / PPM));
+        b2dcamera.setMaxPosition(new Vector2((level.size.x - (Alchera.WIDTH * scale / 2f))/PPM, (level.size.y - (Alchera.HEIGHT * scale / 2f))/PPM));
+        b2dcamera.setPosition(new Vector3(player.getWorldX() / PPM, player.getWorldY() / PPM, 0));
         // Debug renderer to see a representation of what happens in the Box2D world.
         boxRenderer = new Box2DDebugRenderer();
     }
@@ -147,12 +143,24 @@ public class GameplaySceneTest extends Scene {
         for (BaseTrap trap : traps){
             trap.render(batch);
         }
-        hud.render();
+        for(Lock lock : locks){
+            lock.render(batch);
+        }
         // Draw ends here.
         batch.end();
         level.render(camera);
+
+        batch.begin();
+        for(Lock lock : locks){
+            lock.render(batch);
+        }
+        batch.end();
+
+        hud.render();
         // Draw the Box2D world.
-        boxRenderer.render(boxWorld, b2dcamera.combined);
+        if (debug){
+            boxRenderer.render(boxWorld, b2dcamera.combined);
+        }
     }
 
     private void renderBlur(){
@@ -172,6 +180,11 @@ public class GameplaySceneTest extends Scene {
         // Draw ends here.
         batch.end();
         level.render(camera);
+        batch.begin();
+        for(Lock lock : locks){
+            lock.render(batch);
+        }
+        batch.end();
         frameBufferA.end();
 
 
@@ -183,7 +196,7 @@ public class GameplaySceneTest extends Scene {
         frameBufferB.end();
 
         batch.begin();
-        blur.setUniformf("dir",0,1);
+        blur.setUniformf("dir", 0, 1);
         batch.draw(frameBufferB.getColorBufferTexture(), 0, 0);
         batch.end();
     }
@@ -198,9 +211,12 @@ public class GameplaySceneTest extends Scene {
         font.draw(batch,"Fade Amount: " + fade,Alchera.WIDTH - 220, Alchera.HEIGHT - 110);
         font.draw(batch,"INSERT: Toggle Grayscale - " + grayscale,Alchera.WIDTH - 220, Alchera.HEIGHT - 130);
         font.draw(batch,"B: Enable blurring - Currently:" + isBlurred,Alchera.WIDTH - 220, Alchera.HEIGHT - 150);
-        font.draw(batch,"X: Decrease blur",Alchera.WIDTH - 220, Alchera.HEIGHT - 170);
-        font.draw(batch,"C: Increase blur",Alchera.WIDTH - 220, Alchera.HEIGHT - 190);
-        font.draw(batch,"Blur amount: " + blurRadius,Alchera.WIDTH - 220, Alchera.HEIGHT - 210);
+        font.draw(batch, "X: Decrease blur", Alchera.WIDTH - 220, Alchera.HEIGHT - 170);
+        font.draw(batch, "C: Increase blur", Alchera.WIDTH - 220, Alchera.HEIGHT - 190);
+        font.draw(batch, "Blur amount: " + blurRadius, Alchera.WIDTH - 220, Alchera.HEIGHT - 210);
+        font.draw(batch, "R: Reset Level: ", Alchera.WIDTH - 220, Alchera.HEIGHT - 250);
+        font.draw(batch, "HOME: Debug renderer: " + debug, Alchera.WIDTH - 220, Alchera.HEIGHT - 270);
+        font.draw(batch, "END: Unlock camera: " + camLocked , Alchera.WIDTH - 220, Alchera.HEIGHT - 290);
         batch.end();
         batch.setShader(blur);
 
@@ -211,11 +227,17 @@ public class GameplaySceneTest extends Scene {
 
     @Override
     public void update(float delta) {
+        if (player.isDead()){
+            reLoadLevel();
+            return;
+        }else if (player.getHealth() <= 0){
+            Gdx.app.exit();
+        }
 
         shaderTests(delta);
 
         // Move box2d world physics.
-        boxWorld.step(delta, 8, 2);
+        boxWorld.step(1/60f, 8, 3);
         // Update player logic
         player.update(delta);
         for (Bonus bonus : bonuses){
@@ -236,6 +258,14 @@ public class GameplaySceneTest extends Scene {
         for(Bonus bonus : toRemove){
             bonuses.remove(bonus);
         }
+        boolean unlocked = true;
+        for(Lock lock : locks){
+            unlocked = lock.toBeRemoved();
+            lock.update(delta);
+        }
+        if (unlocked){
+            level.spawnExit();
+        }
         toRemove.clear();
 
         // update both camera positions
@@ -249,6 +279,19 @@ public class GameplaySceneTest extends Scene {
                 hud.hide();
             else
                 hud.show();
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.R)){
+            reLoadLevel();
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.HOME)){
+            debug = !debug;
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.END)){
+            camLocked = !camLocked;
+            camera.setLimited(camLocked);
+            b2dcamera.setLimited(camLocked);
         }
     }
 
@@ -294,6 +337,32 @@ public class GameplaySceneTest extends Scene {
         // Testing shaders end.
     }
 
+    private void reLoadLevel(){
+        if (boxWorld != null)
+            boxWorld.dispose();
+        boxWorld = new World(new Vector2(0,-18),false);
+        level = new Level(batch,boxWorld);
+        traps = level.getTraps();
+        bonuses = level.getBonuses();
+        locks = level.getLocks();
+        if (player == null){
+            player = new Player(boxWorld,level.playerSpawn.x,level.playerSpawn.y);
+        }else{
+            player.reCreate(boxWorld, level.playerSpawn.x, level.playerSpawn.y);
+        }
+        if (hud == null)
+            hud = new Hud(manager,player);
+        else{
+            hud.getBonusField().clearBonuses();
+            hud.getHealthBar().setPlayer(player);
+        }
+
+
+        if (contactHandler == null)
+            contactHandler = new ContactHandler();
+        contactHandler.setPlayer(player);
+        boxWorld.setContactListener(contactHandler);
+    }
 
     @Override
     public void dispose() {

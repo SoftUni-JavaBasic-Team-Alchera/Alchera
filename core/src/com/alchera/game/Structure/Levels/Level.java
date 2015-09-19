@@ -35,6 +35,7 @@ public class Level {
     private OrthogonalTiledMapRenderer renderer;
     private World world;
     public Vector2 playerSpawn = new Vector2(0,0);
+    private Vector2 exitCoords = new Vector2(0,0);
     private ArrayList<BaseTrap> traps = new ArrayList<BaseTrap>();
     private LinkedList<Lock> locks = new LinkedList<Lock>();
     private LinkedList<Bonus> bonuses = new LinkedList<Bonus>();
@@ -53,14 +54,14 @@ public class Level {
 
 
     public void render(OrthographicCamera camera){
-
         renderer.setView(camera);
         renderer.render();
     }
 
     public void renderBG(){
         batch.begin();
-        batch.draw(backgroundTxt,-400,0);
+        batch.draw(backgroundTxt, 0, 0);
+        batch.draw(backgroundTxt, 0, backgroundTxt.getHeight());
         batch.end();
     }
 
@@ -84,7 +85,7 @@ public class Level {
                 if (name.endsWith("Yellow")){
                     lock = new Lock(Lock.Type.YELLOW,r.x,r.y);
                 }else if (name.endsWith("Orange")){
-                    lock = new Lock(Lock.Type.ORANGE,r.x,r.y);
+                    lock = new Lock(Lock.Type.BLUE,r.x,r.y);
                 }else{
                     lock = new Lock(Lock.Type.GREEN,r.x,r.y);
                 }
@@ -122,9 +123,7 @@ public class Level {
             }else if (name.startsWith("PlayerSpawn")){
                 this.playerSpawn.set(e.x,e.y);
             }else if (name.startsWith("Exit")){
-                Body bd = BodyFactory.createStaticCircle(world,1,e.x,e.y);
-                bd.getFixtureList().get(0).setSensor(true);
-                bd.getFixtureList().get(0).setUserData("Exit");
+                this.exitCoords.set(e.x,e.y);
             }else if (name.startsWith("Bonus")){
                 if (name.endsWith("Heart")){
                     BonusHealth bonus = new BonusHealth(e.x,e.y);
@@ -150,7 +149,7 @@ public class Level {
                     bd.getFixtureList().get(0).setSensor(true);
                     bd.getFixtureList().get(0).setUserData(key);
                 }else if (name.endsWith("Orange")){
-                    BonusKey key = new BonusKey(Lock.Type.ORANGE,e.x,e.y);
+                    BonusKey key = new BonusKey(Lock.Type.BLUE,e.x,e.y);
                     bonuses.add(key);
                     Body bd = BodyFactory.createStaticEllipse(world,ellipse);
                     key.setBody(bd);
@@ -173,6 +172,11 @@ public class Level {
         for (RectangleMapObject rect : objects.getRectangleObjects()){
             Rectangle r = rect.getRectangle();
             Body bd = BodyFactory.CreateStaticRectangle(world,r.getWidth(),r.getHeight(),r.getX(),r.getY(),1,0.2f);
+            if (rect.getName() != null && rect.getName().equals("Lava")){
+                Fixture f = bd.getFixtureList().get(0);
+                f.setSensor(true);
+                f.setUserData("Death");
+            }
             bd.setUserData("bounds");
         }
 
@@ -187,7 +191,7 @@ public class Level {
         }
 
         for (EllipseMapObject ellipse : objects.getEllipseMapObjects()){
-            Body bd = BodyFactory.createStaticEllipse(world,ellipse);
+            Body bd = BodyFactory.createStaticEllipse(world, ellipse);
             bd.setUserData("bounds");
         }
     }
@@ -203,12 +207,21 @@ public class Level {
         return new Vector2(tilesX * tileWidth,tilesY * tileHeight);
     }
 
+    public void spawnExit(){
+        Body bd = BodyFactory.createStaticCircle(world,1,exitCoords.x,exitCoords.y);
+        bd.getFixtureList().get(0).setSensor(true);
+        bd.getFixtureList().get(0).setUserData("Exit");
+    }
+
     public LinkedList<Bonus> getBonuses(){
         return this.bonuses;
     }
 
-
     public ArrayList<BaseTrap> getTraps() {
         return traps;
+    }
+
+    public LinkedList<Lock> getLocks(){
+        return this.locks;
     }
 }

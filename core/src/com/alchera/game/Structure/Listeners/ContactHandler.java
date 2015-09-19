@@ -1,6 +1,7 @@
 package com.alchera.game.Structure.Listeners;
 
 import com.alchera.game.Structure.Entities.Bonuses.Bonus;
+import com.alchera.game.Structure.Entities.Lock;
 import com.alchera.game.Structure.Entities.Player;
 import com.alchera.game.Structure.Entities.Traps.BaseTrap;
 import com.badlogic.gdx.Gdx;
@@ -11,11 +12,13 @@ public class ContactHandler implements ContactListener {
     private Player player;
     private Fixture playerFix;
 
-    public ContactHandler(Player player){
+    public ContactHandler(){
+    }
+
+    public void setPlayer(Player player){
         this.player = player;
         this.playerFix = player.getBody().getFixtureList().get(0);
     }
-
 
     @Override
     public void beginContact(Contact contact) {
@@ -40,12 +43,17 @@ public class ContactHandler implements ContactListener {
             Bonus bonus = (Bonus)b.getUserData();
             bonus.activate(player);
         }
-
-        if (player.getBody().getFixtureList().get(0) == a && isTrap(b)){
-            player.isDying(true);
+        else if (player.getBody().getFixtureList().get(0) == a && (isTrap(b) || isDeadly(b))){
+            if (player.isDying())
+                return;
+            player.setHealth(player.getHealth()-1);
+            player.setDying(true);
         }
-
-        if(isExit(b)){
+        else if (player.getBody().getFixtureList().get(0) == a && isLock(b)){
+            Lock lock = (Lock)b.getUserData();
+            b.setSensor(lock.Unlock(player));
+        }
+        else if(isExit(b)){
             Gdx.app.exit();
         }
     }
@@ -98,4 +106,8 @@ public class ContactHandler implements ContactListener {
     private boolean isBonus(Fixture b){
         return b.getUserData() != null && b.getUserData() instanceof Bonus;
     }
+
+    private boolean isLock(Fixture b){return b.getUserData() != null && b.getUserData() instanceof Lock;}
+
+    private boolean isDeadly(Fixture b){return b.getUserData() != null && b.getUserData().equals("Death");}
 }

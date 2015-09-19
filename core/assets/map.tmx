@@ -10,7 +10,7 @@
  </layer>
  <layer name="basic" width="30" height="30">
   <data encoding="base64" compression="zlib">
-   eJzF1sENwjAMBdBUDNABemCAHDlw48IN7izQLRigAzBGB2CNbsEcNCIRkeU435UDkSykkuQlbWp3dM69hJjXWJx9Gyv/9912t19jV4iaG5rGHcB+Fi5qUffCxEHhblmDZr9nhV9bg8Y9Kl2poS73LLSxj/N5xvVM/+BK7zgaQ/cxwrtJ3SmuJY9f5A1q/tNFzkArl77X1+zaKV67ue/ZsXKltmS/d9C2dkfQ3uLSPERdxEbdhzAH59bsFvcZsbUul+slt2S33i9nc/nZ8vmW8gC3F81+0z3XuKU5pT6lOm7hzoU+3JlMNfNZGYu4oTbm4xfH579gTtHM62r63ta6aby2ludjURetIWhDXbSGWLuWtle6ya59C1KD9ptA9w2417Xl
+   eJzF1tENwiAQBmAaB+gAfXAAHn13AH13AbZwgA7gGB3ANbqFc1giRHI5jv+aQ0kuJhX4gALX4Jx7CbFssTr7Ehr/j8N+d9ziUImWG4vGncB6Fi5qUffCxEnh7hmD9TqjY+jpSgV1uXehjWPqzzOuZ+pHVzrjaEzDx4hnk7pzGksZv1hnav7TRfZAL5ee62vx7Jye3dx371i5UlmL3ztoW7sBtPe49B6iLmKj7kPog3Nbdo91Rmyty931kluze8+Xs7n72fL91u4Bbi6a+eY117i1PqU6tTxu4S6VOtyezDnz2WiLuDE3lu1Xx99/0ZyTWebV/L2tdXN7bS4v26IumkPQgrpoDrF2LW2vdLPd+hakBq03g+4bUZy1aw==
   </data>
  </layer>
  <objectgroup name="bounds">
@@ -40,8 +40,8 @@
   <object id="53" x="1611.08" y="352.977" width="67.5" height="38.5"/>
   <object id="54" x="1190.96" y="211.492" width="67.5" height="38.5"/>
   <object id="55" x="1611.23" y="72.1288" width="488.765" height="38.5"/>
-  <object id="70" name="Lava" type="Trigger" x="727" y="1653" width="389" height="94"/>
-  <object id="71" name="Lava" type="Trigger" x="716.5" y="2075" width="389" height="32"/>
+  <object id="70" name="Lava" type="Trigger" x="727" y="1659" width="389" height="39"/>
+  <object id="71" name="Lava" type="Trigger" x="710.5" y="2080" width="389" height="32"/>
   <object id="82" x="1960" y="1400.67">
    <polyline points="0,0 70,-0.666667"/>
   </object>

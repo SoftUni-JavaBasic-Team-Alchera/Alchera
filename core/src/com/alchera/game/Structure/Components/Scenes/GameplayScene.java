@@ -47,7 +47,8 @@ public class GameplayScene extends Scene {
         bonuses = level.getBonuses();
         player = new Player(boxWorld,level.playerSpawn.x,level.playerSpawn.y);
         hud = new Hud(manager,player);
-        contactHandler = new ContactHandler(player);
+        contactHandler = new ContactHandler();
+        contactHandler.setPlayer(player);
         boxWorld.setContactListener(contactHandler);
         // Camera for the game world
         camera = new CustomCamera(player);

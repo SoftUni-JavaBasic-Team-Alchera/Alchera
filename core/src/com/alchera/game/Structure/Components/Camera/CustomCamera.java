@@ -39,7 +39,7 @@ public class CustomCamera extends OrthographicCamera {
     }
 
     public void setPosition(Vector3 position){
-        if (isBox2D || !isLimited)
+        if (!isLimited)
             this.position.set(position);
         else
             this.position.set(MathUtils.clamp(position.x,min.x,max.x),MathUtils.clamp(position.y,min.y,max.y),position.z);
