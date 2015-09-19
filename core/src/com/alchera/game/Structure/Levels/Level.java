@@ -37,6 +37,7 @@ public class Level {
     public Vector2 playerSpawn = new Vector2(0,0);
     private Vector2 exitCoords = new Vector2(0,0);
     private ArrayList<BaseTrap> traps = new ArrayList<BaseTrap>();
+    private ArrayList<Vector2> enemyCoords = new ArrayList<Vector2>();
     private LinkedList<Lock> locks = new LinkedList<Lock>();
     private LinkedList<Bonus> bonuses = new LinkedList<Bonus>();
 
@@ -124,6 +125,8 @@ public class Level {
                 this.playerSpawn.set(e.x,e.y);
             }else if (name.startsWith("Exit")){
                 this.exitCoords.set(e.x,e.y);
+            }else if (name.equals("Enemy")){
+                this.enemyCoords.add(new Vector2(e.x,e.y));
             }else if (name.startsWith("Bonus")){
                 if (name.endsWith("Heart")){
                     BonusHealth bonus = new BonusHealth(e.x,e.y);
@@ -224,4 +227,6 @@ public class Level {
     public LinkedList<Lock> getLocks(){
         return this.locks;
     }
+
+    public ArrayList<Vector2> getEnemyCoords() { return this.enemyCoords;}
 }

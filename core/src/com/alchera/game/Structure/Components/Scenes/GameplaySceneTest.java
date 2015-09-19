@@ -5,6 +5,7 @@ import com.alchera.game.Structure.Components.Camera.CustomCamera;
 import com.alchera.game.Structure.Components.Overlays.Hud;
 import com.alchera.game.Structure.Entities.Bonuses.Bonus;
 import com.alchera.game.Structure.Entities.Bonuses.BonusHealth;
+import com.alchera.game.Structure.Entities.Enemys.Enemy;
 import com.alchera.game.Structure.Entities.Lock;
 import com.alchera.game.Structure.Entities.Player;
 import com.alchera.game.Structure.Entities.Traps.*;
@@ -13,6 +14,7 @@ import com.alchera.game.Structure.Listeners.ContactHandler;
 import com.alchera.game.Structure.Managers.SceneManager;
 import static com.alchera.game.Structure.Utils.Variables.*;
 
+import com.alchera.game.Structure.Utils.EnemyFactory;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
@@ -50,6 +52,7 @@ public class GameplaySceneTest extends Scene {
     LinkedList<Bonus> bonuses;
     LinkedList<Lock> locks;
     ArrayList<BaseTrap> traps;
+    ArrayList<Enemy> enemies;
 
     Hud hud;
     World boxWorld;
@@ -81,6 +84,8 @@ public class GameplaySceneTest extends Scene {
         parameter.shadowOffsetX = 3;
         parameter.shadowOffsetY = 3;
         font = generator.generateFont(parameter);
+
+        enemies = new ArrayList<Enemy>();
 
         blur = new ShaderProgram(Gdx.files.internal("shaders/basic.vert"),Gdx.files.internal("shaders/blur.frag"));
         if (!blur.isCompiled())
@@ -143,8 +148,8 @@ public class GameplaySceneTest extends Scene {
         for (BaseTrap trap : traps){
             trap.render(batch);
         }
-        for(Lock lock : locks){
-            lock.render(batch);
+        for (Enemy enemy : enemies){
+            enemy.render(batch);
         }
         // Draw ends here.
         batch.end();
@@ -175,6 +180,9 @@ public class GameplaySceneTest extends Scene {
         }
         for (BaseTrap trap : traps){
             trap.render(batch);
+        }
+        for (Enemy enemy : enemies){
+            enemy.render(batch);
         }
         hud.render();
         // Draw ends here.
@@ -216,7 +224,7 @@ public class GameplaySceneTest extends Scene {
         font.draw(batch, "Blur amount: " + blurRadius, Alchera.WIDTH - 220, Alchera.HEIGHT - 210);
         font.draw(batch, "R: Reset Level: ", Alchera.WIDTH - 220, Alchera.HEIGHT - 250);
         font.draw(batch, "HOME: Debug renderer: " + debug, Alchera.WIDTH - 220, Alchera.HEIGHT - 270);
-        font.draw(batch, "END: Unlock camera: " + camLocked , Alchera.WIDTH - 220, Alchera.HEIGHT - 290);
+        font.draw(batch, "END: Lock camera: " + camLocked , Alchera.WIDTH - 220, Alchera.HEIGHT - 290);
         batch.end();
         batch.setShader(blur);
 
@@ -267,6 +275,10 @@ public class GameplaySceneTest extends Scene {
             level.spawnExit();
         }
         toRemove.clear();
+
+        for (Enemy enemy : enemies){
+            enemy.update(delta);
+        }
 
         // update both camera positions
         camera.update();
@@ -350,16 +362,30 @@ public class GameplaySceneTest extends Scene {
         }else{
             player.reCreate(boxWorld, level.playerSpawn.x, level.playerSpawn.y);
         }
-        if (hud == null)
+
+        player.setJumpMultiplier(1);
+        player.setBonusSpeed(0);
+
+        if (hud == null) {
             hud = new Hud(manager,player);
+        }
         else{
             hud.getBonusField().clearBonuses();
             hud.getHealthBar().setPlayer(player);
         }
 
+        enemies.clear();
+        for (Vector2 pos : level.getEnemyCoords()){
+            try {
+                enemies.add(EnemyFactory.createRandomEnemy(player, boxWorld, (int) pos.x, (int) pos.y));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
-        if (contactHandler == null)
+        if (contactHandler == null) {
             contactHandler = new ContactHandler();
+        }
         contactHandler.setPlayer(player);
         boxWorld.setContactListener(contactHandler);
     }
