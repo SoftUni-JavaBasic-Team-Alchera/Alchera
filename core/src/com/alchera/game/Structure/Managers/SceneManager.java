@@ -15,7 +15,9 @@ public class SceneManager {
         SPLASH,
         MAINMENU,
         GAMEPLAY,
-        CREDITS
+        CREDITS,
+        GAMEOVER,
+        YOUWIN,
     }
 
     private final Alchera application;
@@ -58,7 +60,10 @@ public class SceneManager {
                 return new GameplaySceneTest(this);
             case CREDITS:
                 return new CreditsScene(this);
-
+            case GAMEOVER:
+                return new GameOver(this);
+            case YOUWIN:
+                return new YouWin(this);
         }
         return null;
     }
