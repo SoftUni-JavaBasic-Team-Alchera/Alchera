@@ -15,10 +15,10 @@ public class SawBlade extends BaseTrap {
 
     public SawBlade(World world,float x,float y) {
         this.sprite = new Sprite(new Texture(Gdx.files.internal("sprites/sawblade.png")));
-        this.sprite.setPosition(x,y);
+        this.sprite.setPosition(x - sprite.getWidth()/2,y - sprite.getHeight()/2);
         this.sprite.setOriginCenter();
         this.isStatic = true;
-        this.body = BodyFactory.createStaticCircle(world,sprite.getWidth()/2f,x,y);
+        this.body = BodyFactory.createStaticCircle(world,sprite.getWidth()/2f,x - sprite.getWidth()/2,y - sprite.getHeight()/2);
         this.fixture = body.getFixtureList().get(0);
         this.fixture.setUserData(this);
         this.rotation = 100f;

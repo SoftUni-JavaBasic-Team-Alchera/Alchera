@@ -16,7 +16,11 @@ import static com.alchera.game.Structure.Utils.Variables.PPM;
 public class ShapeFactory {
 
     public static ChainShape createChainShape(PolylineMapObject object){
-        float[] vertecies = object.getPolyline().getTransformedVertices();
+        float[] vertecies = object.getPolyline().getVertices();
+        return createChainShape(vertecies);
+    }
+
+    public static ChainShape createChainShape(float[] vertecies){
         for (int i = 0; i < vertecies.length; i++) {
             vertecies[i] /= Variables.PPM;
         }
@@ -29,7 +33,7 @@ public class ShapeFactory {
     public static CircleShape createCircle(EllipseMapObject object){
         CircleShape shape = new CircleShape();
         shape.setRadius(5/PPM);
-        shape.setPosition(new Vector2(object.getEllipse().x/PPM,object.getEllipse().y/PPM));
+        //shape.setPosition(new Vector2(object.getEllipse().x/PPM,object.getEllipse().y/PPM));
 
         return shape;
     }

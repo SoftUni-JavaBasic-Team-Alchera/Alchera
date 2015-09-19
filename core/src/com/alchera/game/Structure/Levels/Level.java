@@ -1,26 +1,23 @@
 package com.alchera.game.Structure.Levels;
 
-import com.alchera.game.Structure.Entities.Bonuses.Bonus;
-import com.alchera.game.Structure.Entities.Bonuses.BonusHealth;
-import com.alchera.game.Structure.Entities.Bonuses.BonusJump;
-import com.alchera.game.Structure.Entities.Bonuses.BonusSpeed;
-import com.alchera.game.Structure.Entities.Traps.BaseTrap;
-import com.alchera.game.Structure.Utils.ShapeFactory;
-import com.alchera.game.Structure.Utils.Variables;
+import com.alchera.game.Structure.Entities.Bonuses.*;
+import com.alchera.game.Structure.Entities.Lock;
+import com.alchera.game.Structure.Entities.Traps.*;
+import com.alchera.game.Structure.Utils.BodyFactory;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.objects.EllipseMapObject;
+import com.badlogic.gdx.maps.objects.PolygonMapObject;
 import com.badlogic.gdx.maps.objects.PolylineMapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
 
 import java.util.ArrayList;
@@ -36,104 +33,164 @@ public class Level {
     public final Vector2 size;
     private TiledMap map;
     private OrthogonalTiledMapRenderer renderer;
+    private World world;
     public Vector2 playerSpawn = new Vector2(0,0);
-    private ArrayList<Vector2> traps = new ArrayList<Vector2>();
+    private ArrayList<BaseTrap> traps = new ArrayList<BaseTrap>();
+    private LinkedList<Lock> locks = new LinkedList<Lock>();
     private LinkedList<Bonus> bonuses = new LinkedList<Bonus>();
 
 
     public Level(SpriteBatch batch,World world){
         this.batch = batch;
-        map = new TmxMapLoader().load("map1.tmx");
+        this.world = world;
+        map = new TmxMapLoader().load("map.tmx");
         size = parseSize();
         renderer = new OrthogonalTiledMapRenderer(map,batch);
-        parseObjectLayer(world, map.getLayers().get("bounds").getObjects());
         backgroundTxt = new Texture("background.png");
+        this.generateBounds();
+        this.generateObjects();
     }
 
 
     public void render(OrthographicCamera camera){
 
-        batch.begin();
-        batch.draw(backgroundTxt,-400,0);
-        batch.end();
         renderer.setView(camera);
         renderer.render();
     }
 
-    private void parseObjectLayer(World world, MapObjects objects){
-        for(MapObject object : objects){
-            boolean isBonus = false;
-            Shape shape = null;
-            Object objectReference = null;
-            Body body;
-            BodyDef bdef = new BodyDef();
-            FixtureDef fdef = new FixtureDef();
-            String name = null;
-            if (object instanceof PolylineMapObject){
-                shape = ShapeFactory.createChainShape((PolylineMapObject)object);
-                fdef.isSensor = false;
-            }else if (object instanceof EllipseMapObject){
-                EllipseMapObject obj = (EllipseMapObject)object;
-                name = obj.getName();
-                if (name.equals("playerspawn"))
-                    playerSpawn.set(obj.getEllipse().x, obj.getEllipse().y);
-                else if (name.equals("exit")){
-                    shape = ShapeFactory.createCircle(obj);
-                    fdef.isSensor = true;
-                }else if (name.equals("enemy")){
-                    traps.add(new Vector2(obj.getEllipse().x,obj.getEllipse().y));
-                    fdef.isSensor = false;
-                }else if(name.startsWith("Bonus")){
-                    if (name.endsWith("Speed")){
-                        shape = ShapeFactory.createCircle(obj);
-                        fdef.isSensor = true;
-                        BonusSpeed bonus = new BonusSpeed(obj.getEllipse().x,obj.getEllipse().y);
-                        isBonus = true;
-                        bonuses.add(bonus);
-                        objectReference = bonus;
-                    }else if(name.endsWith("Health")){
-                        shape = ShapeFactory.createCircle(obj);
-                        fdef.isSensor = true;
-                        BonusHealth bonus = new BonusHealth(obj.getEllipse().x,obj.getEllipse().y);
-                        isBonus = true;
-                        bonuses.add(bonus);
-                        objectReference = bonus;
-                    }else if(name.endsWith("Jump")){
-                        shape = ShapeFactory.createCircle(obj);
-                        fdef.isSensor = true;
-                        BonusJump bonus = new BonusJump(obj.getEllipse().x,obj.getEllipse().y);
-                        isBonus = true;
-                        bonuses.add(bonus);
-                        objectReference = bonus;
-                    }
-                }
-            }else if(object instanceof RectangleMapObject){
-                RectangleMapObject obj = (RectangleMapObject)object;
-                bdef.position.set(obj.getRectangle().x/ Variables.PPM,obj.getRectangle().y/Variables.PPM);
-                shape = ShapeFactory.createRectangle(obj.getRectangle().width,obj.getRectangle().height);
-                fdef.isSensor = false;
-            }
-            else{
-                continue;
-            }
-
-            if(shape == null)
-                continue;
-
-            bdef.type = BodyDef.BodyType.StaticBody;
-            body = world.createBody(bdef);
-            fdef.density = 1;
-            fdef.shape = shape;
-            Fixture fixture = body.createFixture(fdef);
-            fixture.setUserData(objectReference == null ? name : objectReference);
-            if (isBonus)
-                bonuses.getLast().setBody(body);
-            shape.dispose();
-        }
-
-
+    public void renderBG(){
+        batch.begin();
+        batch.draw(backgroundTxt,-400,0);
+        batch.end();
     }
 
+    private void generateObjects(){
+        TMXObjectLayerParser bounds = new TMXObjectLayerParser(map.getLayers().get("objects"));
+        bounds.parse();
+        for (RectangleMapObject rect : bounds.getRectangleObjects()){
+            String name = rect.getName();
+            Rectangle r = rect.getRectangle();
+            Body bd = BodyFactory.CreateStaticRectangle(world, r.getWidth(), r.getHeight(), r.getX(), r.getY(), 1, 0.2f);
+            if (name.startsWith("Boost")){
+                if (name.endsWith("Jump")){
+                    BonusSpring bonus = new BonusSpring(r.x,r.y);
+                    bd.getFixtureList().get(0).setUserData(bonus);
+                    bd.getFixtureList().get(0).setSensor(true);
+                    bonus.setBody(bd);
+                    bonuses.add(bonus);
+                }
+            }else if (name.startsWith("Lock")){
+                Lock lock;
+                if (name.endsWith("Yellow")){
+                    lock = new Lock(Lock.Type.YELLOW,r.x,r.y);
+                }else if (name.endsWith("Orange")){
+                    lock = new Lock(Lock.Type.ORANGE,r.x,r.y);
+                }else{
+                    lock = new Lock(Lock.Type.GREEN,r.x,r.y);
+                }
+                locks.add(lock);
+                bd.getFixtureList().get(0).setUserData(lock);
+            }
+
+        }
+
+       /* for (PolylineMapObject poly : bounds.getPolylineMapObjects()){
+            //BodyFactory.createStaticPolyline(world, poly);
+        }
+
+        for (PolygonMapObject poly : bounds.getPolygonMapObjects()){
+            //BodyFactory.createStaticPolygon(world, poly);
+        }*/
+
+        for (EllipseMapObject ellipse : bounds.getEllipseMapObjects()){
+            String name = ellipse.getName();
+            Ellipse e = ellipse.getEllipse();
+            if (name.startsWith("Trap")){
+                if (name.endsWith("SawBlade")){
+                    SawBlade trap = new SawBlade(world,e.x,e.y);
+                    traps.add(trap);
+                }else if (name.endsWith("Mine")){
+                    LandMine mine = new LandMine(world,e.x,e.y);
+                    traps.add(mine);
+                }else if (name.endsWith("Flame")){
+                    Flame flame = new Flame(world,e.x,e.y);
+                    traps.add(flame);
+                }else {
+                    Rock rock = new Rock(world,e.x,e.y);
+                    traps.add(rock);
+                }
+            }else if (name.startsWith("PlayerSpawn")){
+                this.playerSpawn.set(e.x,e.y);
+            }else if (name.startsWith("Exit")){
+                Body bd = BodyFactory.createStaticCircle(world,1,e.x,e.y);
+                bd.getFixtureList().get(0).setSensor(true);
+                bd.getFixtureList().get(0).setUserData("Exit");
+            }else if (name.startsWith("Bonus")){
+                if (name.endsWith("Heart")){
+                    BonusHealth bonus = new BonusHealth(e.x,e.y);
+                    bonuses.add(bonus);
+                    Body bd = BodyFactory.createStaticEllipse(world,ellipse);
+                    bonus.setBody(bd);
+                    bd.getFixtureList().get(0).setSensor(true);
+                    bd.getFixtureList().get(0).setUserData(bonus);
+                }else if (name.endsWith("Jump")){
+                    BonusJump bonus = new BonusJump(e.x,e.y);
+                    bonuses.add(bonus);
+                    Body bd = BodyFactory.createStaticEllipse(world,ellipse);
+                    bonus.setBody(bd);
+                    bd.getFixtureList().get(0).setSensor(true);
+                    bd.getFixtureList().get(0).setUserData(bonus);
+                }
+            }else if (name.startsWith("Key")){
+                if (name.endsWith("Yellow")){
+                    BonusKey key = new BonusKey(Lock.Type.YELLOW,e.x,e.y);
+                    bonuses.add(key);
+                    Body bd = BodyFactory.createStaticEllipse(world,ellipse);
+                    key.setBody(bd);
+                    bd.getFixtureList().get(0).setSensor(true);
+                    bd.getFixtureList().get(0).setUserData(key);
+                }else if (name.endsWith("Orange")){
+                    BonusKey key = new BonusKey(Lock.Type.ORANGE,e.x,e.y);
+                    bonuses.add(key);
+                    Body bd = BodyFactory.createStaticEllipse(world,ellipse);
+                    key.setBody(bd);
+                    bd.getFixtureList().get(0).setSensor(true);
+                    bd.getFixtureList().get(0).setUserData(key);
+                }else {
+                    BonusKey key = new BonusKey(Lock.Type.GREEN,e.x,e.y);
+                    bonuses.add(key);
+                    Body bd = BodyFactory.createStaticEllipse(world,ellipse);
+                    bd.getFixtureList().get(0).setSensor(true);
+                    bd.getFixtureList().get(0).setUserData(key);
+                }
+            }
+        }
+    }
+
+    private void generateBounds(){
+        TMXObjectLayerParser objects = new TMXObjectLayerParser(map.getLayers().get("bounds"));
+        objects.parse();
+        for (RectangleMapObject rect : objects.getRectangleObjects()){
+            Rectangle r = rect.getRectangle();
+            Body bd = BodyFactory.CreateStaticRectangle(world,r.getWidth(),r.getHeight(),r.getX(),r.getY(),1,0.2f);
+            bd.setUserData("bounds");
+        }
+
+        for (PolylineMapObject poly : objects.getPolylineMapObjects()){
+            Body bd = BodyFactory.createStaticPolyline(world, poly);
+            bd.setUserData("bounds");
+        }
+
+        for (PolygonMapObject poly : objects.getPolygonMapObjects()){
+            Body bd = BodyFactory.createStaticPolygon(world, poly);
+            bd.setUserData("bounds");
+        }
+
+        for (EllipseMapObject ellipse : objects.getEllipseMapObjects()){
+            Body bd = BodyFactory.createStaticEllipse(world,ellipse);
+            bd.setUserData("bounds");
+        }
+    }
 
     private Vector2 parseSize(){
         MapProperties properties = map.getProperties();
@@ -151,7 +208,7 @@ public class Level {
     }
 
 
-    public ArrayList<Vector2> getTraps() {
+    public ArrayList<BaseTrap> getTraps() {
         return traps;
     }
 }

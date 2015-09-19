@@ -1,5 +1,6 @@
 package com.alchera.game.Structure.Entities;
 
+import com.alchera.game.Structure.Entities.Bonuses.BonusKey;
 import com.alchera.game.Structure.Utils.AssetUtils;
 import com.alchera.game.Structure.Utils.BodyFactory;
 import com.badlogic.gdx.Gdx;
@@ -16,7 +17,7 @@ public class Player implements Disposable{
 
     private final float accelerationSpeed = 20f; // Does not mean it instantly goes to 10f, it does it gradually
     private final float maxSpeed = 4f;
-    private final float jumpForce = 20f;
+    private final float jumpForce = 22f;
     private float jumpMultiplier = 1;
     private float speedBoost = 0;
     private Body body;
@@ -28,6 +29,8 @@ public class Player implements Disposable{
     private boolean isIdle;
     private boolean isGrounded;
 
+
+    private boolean[] keys;
 
     private boolean isFlipped;
     private boolean isDying;
@@ -59,6 +62,8 @@ public class Player implements Disposable{
         groundTrigger = body.createFixture(fdef);
 
         shape.dispose();
+
+        keys = new boolean[3];
 
         isIdle = true;
         idle = atlas.createSprite("run0");
@@ -149,6 +154,22 @@ public class Player implements Disposable{
                 elapsedTime = 0;
                 isIdle = true;
             }
+        }
+    }
+
+
+    public void setKey(Lock.Type key){
+        switch (key){
+
+            case YELLOW:
+                this.keys[0] = true;
+                break;
+            case ORANGE:
+                this.keys[1] = true;
+                break;
+            case GREEN:
+                this.keys[2] = true;
+                break;
         }
     }
 

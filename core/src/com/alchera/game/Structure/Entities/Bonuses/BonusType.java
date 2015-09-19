@@ -11,5 +11,6 @@ public enum BonusType {
     HEALTH,
     LIFE,
     SPEED,
+    SPRING
 
 }

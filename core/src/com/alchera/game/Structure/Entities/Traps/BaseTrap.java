@@ -53,6 +53,21 @@ public abstract class BaseTrap {
         return this.body.getPosition().y * Variables.PPM;
     }
 
+    public void setX(float x){
+        this.body.setTransform(x/Variables.PPM, getWorldY(), body.getAngle());
+        this.sprite.setX(x);
+    }
+
+    public void setY(float y){
+        this.body.setTransform(getWorldX(),y/Variables.PPM,body.getAngle());
+        this.sprite.setY(y);
+    }
+
+    public void setPosition(float x, float y){
+        this.body.setTransform(x/Variables.PPM, y/Variables.PPM, body.getAngle());
+        this.sprite.setPosition(x,y);
+    }
+
     public void setStatic(boolean s){
         this.isStatic = s;
     }

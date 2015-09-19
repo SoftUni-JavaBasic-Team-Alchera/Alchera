@@ -9,9 +9,11 @@ import com.badlogic.gdx.physics.box2d.*;
 public class ContactHandler implements ContactListener {
 
     private Player player;
+    private Fixture playerFix;
 
     public ContactHandler(Player player){
         this.player = player;
+        this.playerFix = player.getBody().getFixtureList().get(0);
     }
 
 
@@ -19,6 +21,12 @@ public class ContactHandler implements ContactListener {
     public void beginContact(Contact contact) {
         Fixture a = contact.getFixtureA();
         Fixture b = contact.getFixtureB();
+
+        if (b == playerFix){
+            a = b;
+            b = contact.getFixtureA();
+        }
+
 
         if (isGroundTrigger(a,b)){
             if(!isBonus(b))
@@ -51,8 +59,11 @@ public class ContactHandler implements ContactListener {
         Fixture a = contact.getFixtureA();
         Fixture b = contact.getFixtureB();
 
+        System.err.println("A:" + a.getUserData());
+        System.err.println("B:" + b.getUserData());
+
         if (isGroundTrigger(a, b)){
-            if(!isBonus(b))
+            if(isGround(b))
             {
                 player.setGrounded(false);
             }
@@ -71,13 +82,17 @@ public class ContactHandler implements ContactListener {
 
     }
 
+    private boolean isGround(Fixture b){
+        return b.getUserData() != null && b.getUserData().equals("bounds");
+    }
+
 
     private boolean isGroundTrigger(Fixture a, Fixture b){
         return a == player.getGroundTrigger() || b == player.getGroundTrigger();
     }
 
     private boolean isExit(Fixture b){
-        return b.getUserData() != null && b.getUserData().equals("exit");
+        return b.getUserData() != null && b.getUserData().equals("Exit");
     }
 
     private boolean isBonus(Fixture b){

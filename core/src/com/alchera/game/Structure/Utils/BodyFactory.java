@@ -1,6 +1,13 @@
 package com.alchera.game.Structure.Utils;
 
 import static com.alchera.game.Structure.Utils.Variables.*;
+
+import com.badlogic.gdx.maps.objects.EllipseMapObject;
+import com.badlogic.gdx.maps.objects.PolygonMapObject;
+import com.badlogic.gdx.maps.objects.PolylineMapObject;
+import com.badlogic.gdx.math.Ellipse;
+import com.badlogic.gdx.math.Polygon;
+import com.badlogic.gdx.math.Polyline;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 
@@ -33,6 +40,30 @@ public class BodyFactory {
 
         Body result = createBody(world,circle,x + radius,y + radius,1,0,false, BodyDef.BodyType.StaticBody);
         circle.dispose();
+        return result;
+    }
+
+    public static Body createStaticPolyline(World world, PolylineMapObject polyline){
+        Polyline line = polyline.getPolyline();
+        ChainShape shape = ShapeFactory.createChainShape(polyline);
+        Body result = createBody(world,shape,line.getX(),line.getY(),1,0.2f,true, BodyDef.BodyType.StaticBody);
+        shape.dispose();
+        return result;
+    }
+
+    public static Body createStaticPolygon(World world, PolygonMapObject polygon){
+        Polygon poly = polygon.getPolygon();
+        ChainShape shape = ShapeFactory.createChainShape(poly.getTransformedVertices());
+        Body result = createBody(world,shape,poly.getX(),poly.getY(),1,0.2f,true, BodyDef.BodyType.StaticBody);
+        shape.dispose();
+        return result;
+    }
+
+    public static Body createStaticEllipse(World world,EllipseMapObject ellipse){
+        Ellipse e = ellipse.getEllipse();
+        CircleShape shape = ShapeFactory.createCircle(ellipse);
+        Body result = createBody(world,shape,e.x,e.y,1,0.2f,true, BodyDef.BodyType.StaticBody);
+        shape.dispose();
         return result;
     }
 

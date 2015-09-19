@@ -61,6 +61,10 @@ public abstract class Overlay implements Disposable{
         return isVisible;
     }
 
+    public OrthographicCamera getCamera(){
+        return this.camera;
+    }
+
     public void setTransition(Transition t){
         this.transition = t;
     }

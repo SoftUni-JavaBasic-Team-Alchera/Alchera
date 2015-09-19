@@ -1,52 +1,102 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="30" height="15" tilewidth="70" tileheight="70" nextobjectid="32">
- <tileset firstgid="1" name="set" tilewidth="70" tileheight="70" spacing="2" tilecount="156">
-  <image source="sprites/mapsheet.png" width="914" height="936"/>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="70" tileheight="70" nextobjectid="84">
+ <tileset firstgid="1" name="set" tilewidth="70" tileheight="70" spacing="2" tilecount="312">
+  <image source="sprites/mapsheet.png" width="914" height="1872"/>
  </tileset>
- <layer name="Tile Layer 2" width="30" height="15">
+ <layer name="back" width="30" height="30">
   <data encoding="base64" compression="zlib">
-   eJxjYBgFo2AUjIJRQC5IJ4BHweAHAIkjAzk=
+   eJxjYBgFo2Bggd4A2Ws1QPaOglEwCkbBKBgFo4C+oBsPpjXgwIJHwSigBFA7LQMApC8HoA==
   </data>
  </layer>
- <layer name="Tile Layer 1" width="30" height="15">
+ <layer name="basic" width="30" height="30">
   <data encoding="base64" compression="zlib">
-   eJxjYBgFo2DoAcmBdgAU6A2QvVZA7EihGehhqAjEGURiGNDEY34gEW4A2SkKxDOJxLjcw0mCG0i1Ex+egcduEChBciM5do4C+gAABPAiBg==
+   eJzF1sENwjAMBdBUDNABemCAHDlw48IN7izQLRigAzBGB2CNbsEcNCIRkeU435UDkSykkuQlbWp3dM69hJjXWJx9Gyv/9912t19jV4iaG5rGHcB+Fi5qUffCxEHhblmDZr9nhV9bg8Y9Kl2poS73LLSxj/N5xvVM/+BK7zgaQ/cxwrtJ3SmuJY9f5A1q/tNFzkArl77X1+zaKV67ue/ZsXKltmS/d9C2dkfQ3uLSPERdxEbdhzAH59bsFvcZsbUul+slt2S33i9nc/nZ8vmW8gC3F81+0z3XuKU5pT6lOm7hzoU+3JlMNfNZGYu4oTbm4xfH579gTtHM62r63ta6aby2ludjURetIWhDXbSGWLuWtle6ya59C1KD9ptA9w2417Xl
   </data>
  </layer>
  <objectgroup name="bounds">
-  <object id="1" x="0" y="282">
-   <polyline points="0,0 0,418 419,417 554,552"/>
+  <object id="32" x="71" y="70">
+   <polyline points="0,0 -1,213 417,213 418,239"/>
   </object>
-  <object id="6" x="1050" y="561" width="69.5" height="68"/>
-  <object id="8" x="1680" y="349.5" width="70.5" height="69.5"/>
-  <object id="9" name="exit" x="1985.5" y="522.5" width="26" height="24">
+  <object id="34" x="72" y="70">
+   <polyline points="0,0 487,-1 558,70 558,490 278,490 208,560 208,1610 348,1750 1048,1750 1188,1610 1188,840 1188,778.667 1180.33,769.333 908,770 946,838 1118,840 1118,1540 1048,1540 978,1610"/>
+  </object>
+  <object id="35" x="770" y="1684">
+   <polyline points="0,0 -70,-74 -70,-774 104,-774 140,-844 -70,-844 -70,-1054 1120,-1054 1190,-1124 1120,-1194 420,-1194 -70,-1194 -70,-1684 1050,-1684 1330,-1684 1330,-1194 1260,-1124 1330,-1054 1330,-354 1260,-284"/>
+  </object>
+  <object id="37" x="1960" y="1400">
+   <polyline points="0,0 -560,-560 -616,-562 -628,-552 -630,280 -490,420 -490,560 -560,630 -840,630 -910,700"/>
+  </object>
+  <object id="41" x="911.25" y="1051" width="67.5" height="38.5"/>
+  <object id="42" x="840.917" y="1263.42" width="67.5" height="38.5"/>
+  <object id="43" x="1050.92" y="1472.75" width="67.5" height="38.5"/>
+  <object id="44" x="771.583" y="1541.42" width="67.5" height="38.5"/>
+  <object id="45" x="700.917" y="1401.42" width="67.5" height="38.5"/>
+  <object id="46" x="700.917" y="1120.75" width="67.5" height="38.5"/>
+  <object id="47" x="770" y="2100">
+   <polyline points="0,0 -70,-70 -490,-70 -700,-280 -700,-1750 -351,-1751 -282,-1793"/>
+  </object>
+  <object id="51" x="1401.2" y="143.295" width="67.5" height="38.5"/>
+  <object id="52" x="1401.11" y="283.159" width="67.5" height="38.5"/>
+  <object id="53" x="1611.08" y="352.977" width="67.5" height="38.5"/>
+  <object id="54" x="1190.96" y="211.492" width="67.5" height="38.5"/>
+  <object id="55" x="1611.23" y="72.1288" width="488.765" height="38.5"/>
+  <object id="70" name="Lava" type="Trigger" x="727" y="1653" width="389" height="94"/>
+  <object id="71" name="Lava" type="Trigger" x="716.5" y="2075" width="389" height="32"/>
+  <object id="82" x="1960" y="1400.67">
+   <polyline points="0,0 70,-0.666667"/>
+  </object>
+ </objectgroup>
+ <objectgroup name="objects">
+  <object id="48" name="Lock.Orange" x="770" y="350" width="70" height="70"/>
+  <object id="49" name="Lock.Yellow" x="770" y="420" width="70" height="70"/>
+  <object id="56" name="Boost.Jump" x="1260" y="1960" width="70" height="70"/>
+  <object id="58" name="Boost.Jump" x="1960" y="1330" width="70" height="70"/>
+  <object id="62" name="Trap.SawBlade" x="630" y="559">
    <ellipse/>
   </object>
-  <object id="10" name="playerspawn" x="78" y="646" width="21" height="21">
+  <object id="63" name="Key.Yellow" x="108" y="386">
    <ellipse/>
   </object>
-  <object id="12" x="630" y="630" width="70" height="25.3333"/>
-  <object id="15" x="839.333" y="700" width="70" height="25.3333"/>
-  <object id="16" x="980.333" y="770.333" width="209.667" height="27.3333"/>
-  <object id="18" x="1189.67" y="770.667">
-   <polyline points="0,0 211,-211 910,-211"/>
-  </object>
-  <object id="20" name="enemy" x="1084.85" y="730.303" width="21.2121" height="21.2121">
+  <object id="64" name="Trap.SawBlade" x="70" y="840">
    <ellipse/>
   </object>
-  <object id="21" x="2093.94" y="560.606">
-   <polyline points="0,0 3.0303,-600"/>
-  </object>
-  <object id="23" name="enemy" x="1495.45" y="489.394" width="21.2121" height="21.2121">
+  <object id="65" name="Trap.SawBlade" x="280" y="1050">
    <ellipse/>
   </object>
-  <object id="28" name="Bonus.Health" x="877.333" y="668">
+  <object id="66" name="Trap.SawBlade" x="70" y="1260">
    <ellipse/>
   </object>
-  <object id="29" name="Bonus.Speed" x="377" y="663">
+  <object id="67" name="Trap.SawBlade" x="280" y="1470">
    <ellipse/>
   </object>
-  <object id="31" name="Bonus.Speed" x="662" y="600">
+  <object id="68" name="Trap.SawBlade" x="70" y="1680">
+   <ellipse/>
+  </object>
+  <object id="69" name="Enemy" x="529" y="1995">
+   <ellipse/>
+  </object>
+  <object id="73" name="Bonus.Heart" x="1153" y="1574">
+   <ellipse/>
+  </object>
+  <object id="75" name="Trap.Flame" x="1097" y="1261">
+   <ellipse/>
+  </object>
+  <object id="76" name="Trap.Mine" x="687" y="1385">
+   <ellipse/>
+  </object>
+  <object id="77" name="Bonus.Jump" x="733" y="1090">
+   <ellipse/>
+  </object>
+  <object id="78" name="Key.Orange" x="2062" y="39">
+   <ellipse/>
+  </object>
+  <object id="79" name="PlayerSpawn" x="161" y="233">
+   <ellipse/>
+  </object>
+  <object id="80" name="Exit" x="791" y="461">
+   <ellipse/>
+  </object>
+  <object id="81" name="Bonus.Jump" x="368" y="1984">
    <ellipse/>
   </object>
  </objectgroup>

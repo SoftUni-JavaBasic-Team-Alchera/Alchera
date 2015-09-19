@@ -25,6 +25,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -69,7 +70,7 @@ public class GameplaySceneTest extends Scene {
         fade = 1f;
         blurRadius = 0f;
         isBlurred = false;
-        traps = new ArrayList<BaseTrap>();
+
 
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/bodoni.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
@@ -85,7 +86,7 @@ public class GameplaySceneTest extends Scene {
         if (!blur.isCompiled())
             System.err.println(blur.getLog());
         blur.begin();
-        blur.setUniformf("u_fade",fade);
+        blur.setUniformf("u_fade", fade);
         blur.setUniformf("dir", 0f, 0f);
         blur.setUniformf("radius", blurRadius);
         blur.setUniformf("resolution", Alchera.WIDTH);
@@ -99,16 +100,13 @@ public class GameplaySceneTest extends Scene {
         boxWorld = new World(new Vector2(0, -18), true);
 
         level = new Level(batch,boxWorld);
+
+        traps = level.getTraps();
         bonuses = level.getBonuses();
         player = new Player(boxWorld,level.playerSpawn.x,level.playerSpawn.y);
         hud = new Hud(manager,player);
         contactHandler = new ContactHandler(player);
         boxWorld.setContactListener(contactHandler);
-
-        for(Vector2 position : level.getTraps()){
-            this.traps.add(TrapFactory.createRandomTrap(boxWorld,position.x,position.y));
-        }
-
 
         // Camera for the game world
         camera = new CustomCamera(player);
@@ -139,20 +137,20 @@ public class GameplaySceneTest extends Scene {
 
     private void renderDefault(){
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        level.render(camera);
+        level.renderBG();
         batch.begin();
         // Draw the player.
         player.render(batch);
         for (Bonus bonus : bonuses){
             bonus.render(batch);
         }
-
         for (BaseTrap trap : traps){
             trap.render(batch);
         }
         hud.render();
         // Draw ends here.
         batch.end();
+        level.render(camera);
         // Draw the Box2D world.
         boxRenderer.render(boxWorld, b2dcamera.combined);
     }
@@ -160,7 +158,7 @@ public class GameplaySceneTest extends Scene {
     private void renderBlur(){
         frameBufferA.begin();
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        level.render(camera);
+        level.renderBG();
         batch.begin();
         // Draw the player.
         player.render(batch);
@@ -173,6 +171,7 @@ public class GameplaySceneTest extends Scene {
         hud.render();
         // Draw ends here.
         batch.end();
+        level.render(camera);
         frameBufferA.end();
 
 
@@ -192,6 +191,7 @@ public class GameplaySceneTest extends Scene {
     private void renderDebugInfo(){
         batch.setShader(defaultShader);
         batch.begin();
+        batch.setProjectionMatrix(hud.getCamera().combined);
         font.draw(batch, "Debug info", Alchera.WIDTH - 220, Alchera.HEIGHT - 50);
         font.draw(batch, "UP: Fade in", Alchera.WIDTH - 220, Alchera.HEIGHT - 70);
         font.draw(batch,"DOWN: Fade out",Alchera.WIDTH - 220, Alchera.HEIGHT - 90);
