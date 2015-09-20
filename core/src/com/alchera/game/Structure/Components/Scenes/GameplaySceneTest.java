@@ -86,12 +86,15 @@ public class GameplaySceneTest extends Scene {
         font = generator.generateFont(parameter);
 
         enemies = new ArrayList<Enemy>();
+        reLoadLevel();
 
         blur = new ShaderProgram(Gdx.files.internal("shaders/basic.vert"),Gdx.files.internal("shaders/blur.frag"));
-        if (!blur.isCompiled())
+        if (!blur.isCompiled()) {
             System.err.println(blur.getLog());
+        }
+
         blur.begin();
-        blur.setUniformf("u_fade", fade);
+        blur.setUniformf("fade", fade);
         blur.setUniformf("dir", 0f, 0f);
         blur.setUniformf("radius", blurRadius);
         blur.setUniformf("resolution", Alchera.WIDTH);
@@ -103,7 +106,6 @@ public class GameplaySceneTest extends Scene {
         frameBufferA = new FrameBuffer(Pixmap.Format.RGBA8888,Gdx.graphics.getWidth(),Gdx.graphics.getHeight(),false,false);
         frameBufferB = new FrameBuffer(Pixmap.Format.RGBA8888,Gdx.graphics.getWidth(),Gdx.graphics.getHeight(),false,false);
 
-        reLoadLevel();
 
         // Camera for the game world
         camera = new CustomCamera(player);
@@ -218,7 +220,7 @@ public class GameplaySceneTest extends Scene {
         font.draw(batch,"DOWN: Fade out",Alchera.WIDTH - 220, Alchera.HEIGHT - 90);
         font.draw(batch,"Fade Amount: " + fade,Alchera.WIDTH - 220, Alchera.HEIGHT - 110);
         font.draw(batch,"INSERT: Toggle Grayscale - " + grayscale,Alchera.WIDTH - 220, Alchera.HEIGHT - 130);
-        font.draw(batch,"B: Enable blurring - Currently:" + isBlurred,Alchera.WIDTH - 220, Alchera.HEIGHT - 150);
+        font.draw(batch, "B: Enable blurring - Currently:" + isBlurred, Alchera.WIDTH - 220, Alchera.HEIGHT - 150);
         font.draw(batch, "X: Decrease blur", Alchera.WIDTH - 220, Alchera.HEIGHT - 170);
         font.draw(batch, "C: Increase blur", Alchera.WIDTH - 220, Alchera.HEIGHT - 190);
         font.draw(batch, "Blur amount: " + blurRadius, Alchera.WIDTH - 220, Alchera.HEIGHT - 210);
@@ -239,13 +241,17 @@ public class GameplaySceneTest extends Scene {
             reLoadLevel();
             return;
         }else if (player.getHealth() <= 0){
-            Gdx.app.exit();
+            manager.setScene(SceneManager.SceneType.GAMEOVER);
+            return;
+        }else if (player.isFinished()){
+            manager.setScene(SceneManager.SceneType.YOUWIN);
+            return;
         }
 
         shaderTests(delta);
 
         // Move box2d world physics.
-        boxWorld.step(1/60f, 8, 3);
+        boxWorld.step(1 / 60f, 8, 3);
         // Update player logic
         player.update(delta);
         for (Bonus bonus : bonuses){
@@ -312,13 +318,13 @@ public class GameplaySceneTest extends Scene {
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             fade = MathUtils.clamp(fade - delta,0,1);
             batch.getShader().begin();
-            batch.getShader().setUniformf("u_fade",fade);
+            batch.getShader().setUniformf("fade",fade);
             batch.getShader().end();
         }
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
             fade = MathUtils.clamp(fade + delta,0,1);
             batch.getShader().begin();
-            batch.getShader().setUniformf("u_fade", fade);
+            batch.getShader().setUniformf("fade", fade);
             batch.getShader().end();
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.INSERT)){

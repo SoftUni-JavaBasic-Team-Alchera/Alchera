@@ -33,7 +33,7 @@ public class Alchera extends ApplicationAdapter {
 		if (!shader.isCompiled())
 			System.err.println(shader.getLog());
 		shader.begin();
-		shader.setUniformf("u_fade",1f);
+		shader.setUniformf("fade",1f);
 		shader.end();
 		batch.setShader(shader);
 

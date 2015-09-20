@@ -1,5 +1,6 @@
 package com.alchera.game.Structure.Components.Scenes;
 
+import com.alchera.game.Alchera;
 import com.alchera.game.Structure.Managers.SceneManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -50,6 +51,11 @@ public class GameOver extends Scene{
                 "EXIT"
         };
         weasel = new Texture("sprites/baboon.png");
+        camera.setToOrtho(false, Alchera.WIDTH,Alchera.HEIGHT);
+        batch.getShader().begin();
+        batch.getShader().setUniformf("fade",1);
+        batch.getShader().end();
+        batch.setProjectionMatrix(camera.combined);
 
     }
 

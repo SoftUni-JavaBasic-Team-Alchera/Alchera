@@ -54,7 +54,7 @@ public class ContactHandler implements ContactListener {
             b.setSensor(lock.Unlock(player));
         }
         else if(isExit(b)){
-            Gdx.app.exit();
+            player.setFinished(true);
         }
     }
 

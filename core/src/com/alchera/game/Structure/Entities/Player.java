@@ -33,7 +33,8 @@ public class Player implements Disposable{
 
     private boolean isFlipped;
     private boolean isDying;
-    private boolean dead; // used to dead the update loop for testing purposes
+    private boolean isFinished;
+    private boolean dead;
 
     private Sprite idle;
     private TextureAtlas atlas;
@@ -271,6 +272,14 @@ public class Player implements Disposable{
 
     public void setDying(boolean dying) {
         this.isDying = dying;
+    }
+
+    public boolean isFinished(){
+        return this.isFinished;
+    }
+
+    public void setFinished(boolean finished){
+        this.isFinished = finished;
     }
 
     public boolean isDying(){

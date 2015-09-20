@@ -5,7 +5,7 @@ uniform sampler2D u_texture;
 uniform float resolution;
 uniform float radius;
 uniform vec2 dir;
-uniform float u_fade;
+uniform float fade;
 uniform bool u_grayscale;
 uniform bool u_blur;
 
@@ -38,12 +38,12 @@ void main() {
 
     if(u_grayscale){
         vec4 tc = texture2D(u_texture,v_texCoords);
-        vec3 color = (u_blur ? blurRGB() : tc.rgb) * u_fade;
+        vec3 color = (u_blur ? blurRGB() : tc.rgb) * fade;
         float grayscale = dot(color,vec3(0.2f,0.5f,0.1f));
         gl_FragColor = v_color * vec4(grayscale,grayscale,grayscale,tc.a);
     }else{
         vec4 tc = texture2D(u_texture,v_texCoords);
-        vec3 color = (u_blur ? blurRGB() : tc.rgb) * u_fade;
+        vec3 color = (u_blur ? blurRGB() : tc.rgb) * fade;
         gl_FragColor = v_color * vec4(color,tc.a);
     }
 }

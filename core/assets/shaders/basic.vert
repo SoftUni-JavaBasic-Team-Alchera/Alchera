@@ -7,6 +7,7 @@ varying vec2 v_texCoords;
 
 uniform mat4 u_projTrans;
 
+
 void main()
 {
    v_color = a_color;

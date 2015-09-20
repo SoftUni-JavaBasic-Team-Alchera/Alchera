@@ -26,7 +26,7 @@ public class SceneManager {
     public SceneManager(final Alchera app){
         this.application = app;
         this.scenes = new PriorityQueue<Scene>();
-        this.setScene(SceneType.GAMEPLAY);
+        this.setScene(SceneType.SPLASH);
     }
 
     public void update(float delta){
