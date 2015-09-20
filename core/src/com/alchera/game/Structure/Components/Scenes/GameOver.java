@@ -9,6 +9,9 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector3;
 
 /**
  * Created by Nedyalkov on 9/13/2015.
@@ -23,6 +26,11 @@ public class GameOver extends Scene{
     private Texture weasel;
 
     private int currentItem;
+    private Vector3 camPositionIn;
+    private Vector3 camPositionOut;
+    private ShaderProgram shader;
+    private float alpha;
+    private boolean transitionExit;
 
     public GameOver(SceneManager sm) {
         super(sm);
@@ -51,18 +59,20 @@ public class GameOver extends Scene{
                 "EXIT"
         };
         weasel = new Texture("sprites/baboon.png");
-        camera.setToOrtho(false, Alchera.WIDTH,Alchera.HEIGHT);
-        batch.getShader().begin();
-        batch.getShader().setUniformf("fade",1);
-        batch.getShader().end();
-        batch.setProjectionMatrix(camera.combined);
+        camPositionIn = camera.position.cpy();
+        camera.position.set(-Alchera.WIDTH / 2f, -Alchera.HEIGHT/2, camera.position.z);
+        camPositionOut = camera.position.cpy();
+
+        shader = batch.getShader();
 
     }
 
     @Override
     public void render() {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        batch.setProjectionMatrix(camera.combined);
         batch.begin();
+        shader.setUniformf("fade",alpha);
         //draw weasel
         batch.draw(weasel,700,0);
         //draw title
@@ -79,6 +89,22 @@ public class GameOver extends Scene{
 
     @Override
     public void update(float delta) {
+        alpha = MathUtils.clamp(alpha + delta, 0, 1);
+        if (!transitionExit){
+            float x = MathUtils.lerp(camera.position.x,camPositionIn.x,0.1f);
+            float y = MathUtils.lerp(camera.position.y,camPositionIn.y,0.1f);
+            this.camera.position.set(x,y,camera.position.z);
+        }else{
+            float x = MathUtils.lerp(camera.position.x,camPositionOut.x,0.1f);
+            float y = MathUtils.lerp(camera.position.y,camPositionOut.y,0.1f);
+
+            this.camera.position.set(x,y,camera.position.z);
+            if (camPositionOut.epsilonEquals(camera.position, 0.01f)){
+                camera.position.set(camPositionIn);
+                changeGameState();
+            }
+        }
+        camera.update();
         handleInput();
     }
 
@@ -96,7 +122,7 @@ public class GameOver extends Scene{
             if (currentItem<2) currentItem++;
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)){
-            changeGameState();
+            transitionExit = true;
         }
     }
 

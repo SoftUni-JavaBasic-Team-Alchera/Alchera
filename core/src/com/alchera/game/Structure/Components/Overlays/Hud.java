@@ -16,17 +16,19 @@ public class Hud extends Overlay {
 
     private BonusField bonusField;
     private HealthBar healthBar;
+    private Timer timer;
     private boolean isTransitioningIn = false;
     private boolean isTransitioningOut = false;
 
     public Hud(SceneManager sm,Player player) {
         super(sm);
-        bonusField = new BonusField(25,Alchera.HEIGHT - 100);
-        healthBar = new HealthBar();
-        healthBar.setPlayer(player);
-        this.components.add(healthBar);
-        this.components.add(new Timer(25, 40));
-        this.components.add(bonusField);
+        this.bonusField = new BonusField(25,Alchera.HEIGHT - 100);
+        this.healthBar = new HealthBar();
+        this.healthBar.setPlayer(player);
+        this.timer = new Timer(25, 40);
+        this.components.add(this.healthBar);
+        this.components.add(this.timer);
+        this.components.add(this.bonusField);
         this.transition = new Transition() {
 
 
@@ -96,5 +98,9 @@ public class Hud extends Overlay {
     @Override
     public void dispose() {
         super.dispose();
+    }
+
+    public Timer getTimer() {
+        return timer;
     }
 }

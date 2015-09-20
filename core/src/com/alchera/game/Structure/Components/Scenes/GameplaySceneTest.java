@@ -62,8 +62,11 @@ public class GameplaySceneTest extends Scene {
     boolean isBlurred;
     boolean grayscale = false;
     final float scale = 0.75f;
-    private boolean debug;
+    private boolean debug,debugInfo;
     private boolean camLocked;
+    private boolean transitionIn;
+    private boolean transitionOut;
+    private float elapsedTime;
 
 
     public GameplaySceneTest(SceneManager sm){
@@ -71,7 +74,7 @@ public class GameplaySceneTest extends Scene {
     }
     @Override
     protected void create(){
-        fade = 1f;
+        fade = 0f;
         blurRadius = 0f;
         isBlurred = false;
         camLocked = true;
@@ -101,6 +104,9 @@ public class GameplaySceneTest extends Scene {
         blur.end();
 
         defaultShader = batch.getShader();
+        defaultShader.begin();
+        defaultShader.setUniformf("fade", 1);
+        defaultShader.end();
         batch.setShader(blur);
 
         frameBufferA = new FrameBuffer(Pixmap.Format.RGBA8888,Gdx.graphics.getWidth(),Gdx.graphics.getHeight(),false,false);
@@ -135,10 +141,11 @@ public class GameplaySceneTest extends Scene {
         }else{
             renderDefault();
         }
-        renderDebugInfo();
+        if (debugInfo)
+            renderDebugInfo();
     }
 
-    private void renderDefault(){
+    private void renderDefault() {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         level.renderBG();
         batch.begin();
@@ -170,7 +177,7 @@ public class GameplaySceneTest extends Scene {
         }
     }
 
-    private void renderBlur(){
+    private void renderBlur() {
         frameBufferA.begin();
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         level.renderBG();
@@ -186,15 +193,17 @@ public class GameplaySceneTest extends Scene {
         for (Enemy enemy : enemies){
             enemy.render(batch);
         }
-        hud.render();
         // Draw ends here.
         batch.end();
         level.render(camera);
+
         batch.begin();
         for(Lock lock : locks){
             lock.render(batch);
         }
         batch.end();
+
+        hud.render();
         frameBufferA.end();
 
 
@@ -214,6 +223,7 @@ public class GameplaySceneTest extends Scene {
     private void renderDebugInfo(){
         batch.setShader(defaultShader);
         batch.begin();
+
         batch.setProjectionMatrix(hud.getCamera().combined);
         font.draw(batch, "Debug info", Alchera.WIDTH - 220, Alchera.HEIGHT - 50);
         font.draw(batch, "UP: Fade in", Alchera.WIDTH - 220, Alchera.HEIGHT - 70);
@@ -226,7 +236,7 @@ public class GameplaySceneTest extends Scene {
         font.draw(batch, "Blur amount: " + blurRadius, Alchera.WIDTH - 220, Alchera.HEIGHT - 210);
         font.draw(batch, "R: Reset Level: ", Alchera.WIDTH - 220, Alchera.HEIGHT - 250);
         font.draw(batch, "HOME: Debug renderer: " + debug, Alchera.WIDTH - 220, Alchera.HEIGHT - 270);
-        font.draw(batch, "END: Lock camera: " + camLocked , Alchera.WIDTH - 220, Alchera.HEIGHT - 290);
+        font.draw(batch, "END: Lock camera: " + camLocked, Alchera.WIDTH - 220, Alchera.HEIGHT - 290);
         batch.end();
         batch.setShader(blur);
 
@@ -237,16 +247,43 @@ public class GameplaySceneTest extends Scene {
 
     @Override
     public void update(float delta) {
-        if (player.isDead()){
+        elapsedTime += delta;
+        if (!transitionIn && elapsedTime > 1f){
+            fade = MathUtils.clamp(fade + delta/4,0,1);
+            blur.begin();
+            blur.setUniformf("fade",fade);
+            blur.end();
+            if (fade >= 1){
+                transitionIn = true;
+            }
+        }else if (transitionIn){
+            hud.getTimer().restart();
+        }
+
+        if (transitionOut){
+            fade = MathUtils.clamp(fade - delta/2,0,1);
+            blur.begin();
+            blur.setUniformf("fade",fade);
+            blur.end();
+            if (fade <= 0){
+                if (player.getHealth() <= 0){
+                    manager.setScene(SceneManager.SceneType.GAMEOVER);
+                    return;
+                }else if (player.isFinished()){
+                    manager.setScene(SceneManager.SceneType.YOUWIN);
+                    return;
+                }
+            }
+        }
+
+        if (player.getHealth() <= 0 || player.isFinished()){
+            transitionOut = true;
+            return;
+        }else if (player.isDead()){
             reLoadLevel();
             return;
-        }else if (player.getHealth() <= 0){
-            manager.setScene(SceneManager.SceneType.GAMEOVER);
-            return;
-        }else if (player.isFinished()){
-            manager.setScene(SceneManager.SceneType.YOUWIN);
-            return;
         }
+
 
         shaderTests(delta);
 
@@ -301,12 +338,11 @@ public class GameplaySceneTest extends Scene {
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.R)){
             reLoadLevel();
-        }
-
-        if (Gdx.input.isKeyJustPressed(Input.Keys.HOME)){
+        }else if (Gdx.input.isKeyJustPressed(Input.Keys.HOME)){
             debug = !debug;
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.END)){
+        }else if (Gdx.input.isKeyJustPressed(Input.Keys.F1)){
+            debugInfo = !debugInfo;
+        }else if (Gdx.input.isKeyJustPressed(Input.Keys.END)){
             camLocked = !camLocked;
             camera.setLimited(camLocked);
             b2dcamera.setLimited(camLocked);

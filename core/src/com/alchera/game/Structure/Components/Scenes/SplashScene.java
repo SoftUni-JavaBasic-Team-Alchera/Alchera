@@ -10,6 +10,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.MathUtils;
 
 /**
  * Created by Inspix on 10/09/2015.
@@ -24,7 +26,8 @@ public class SplashScene extends Scene {
     private float elapsedTime;
     private float counterTime;
     private float alpha;
-    private Sprite blackPixel;
+    private float blur;
+    private ShaderProgram shader;
 
     public SplashScene(SceneManager sm) {
         super(sm);
@@ -32,19 +35,15 @@ public class SplashScene extends Scene {
 
     @Override
     protected void create() {
-        Pixmap pixel = new Pixmap(1,1, Pixmap.Format.RGBA8888);
-        pixel.setColor(1, 1, 1, 1);
-        pixel.fill();
-        batch.enableBlending();
-        blackPixel = new Sprite(new Texture(pixel));
         font = new BitmapFont(Gdx.files.getFileHandle("fonts/test.fnt", Files.FileType.Internal));
         layoutAlchera = new GlyphLayout(font,"Alchera");
         layoutPresents = new GlyphLayout(font,"");
-        Gdx.app.log("Layoyt:", String.valueOf(layoutAlchera.width));
+        alpha = 0;
+        shader = batch.getShader();
 
-        alpha = 1f;
-        blackPixel.setSize(Alchera.WIDTH, Alchera.HEIGHT);
-        blackPixel.setPosition(0,0);
+        shader.begin();
+        shader.setUniformf("fade", alpha);
+        shader.end();
     }
 
     @Override
@@ -52,38 +51,32 @@ public class SplashScene extends Scene {
         // glClear is a must! should be in each Scene implementation
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
+        shader.setUniformf("fade", MathUtils.clamp(alpha,0,1));
         font.getData().setScale(1, 1);
         font.draw(batch,layoutAlchera,Alchera.WIDTH/2 - layoutAlchera.width/2,Alchera.HEIGHT/2 + layoutAlchera.height/2);
         if (elapsedTime > 5f){
             font.getData().setScale(0.5f, 0.5f);
             font.draw(batch, layoutPresents, Alchera.WIDTH / 2 - (layoutPresents.width / 2.0f), Alchera.HEIGHT / 2 - layoutPresents.height);
         }
-        blackPixel.draw(batch);
         batch.end();
     }
 
     @Override
     public void update(float delta) {
-        if (elapsedTime > 10f){
+        if (elapsedTime < 5f){
             alpha += delta * 0.5f;
-            Gdx.app.log("Alpha:", String.valueOf(alpha));
-            blackPixel.setColor(0,0,0,alpha >= 1 ? 1 : alpha);
-            if (alpha >= 1f){
-                manager.setScene(SceneManager.SceneType.MAINMENU);
-            }
 
         }
-        else if(elapsedTime > 5f){
+        else if(elapsedTime > 1.5f){
             counterTime += delta;
-            if (counterTime >= 0.25f && counter <=7) {
+            if (counterTime >= 0.15f && counter <=7) {
                 layoutPresents.setText(font,presents.substring(0,++counter));
-                counterTime -= 0.25f;
-            }
-        }
-        else{
-            if (alpha > 0f){
-                alpha -= delta;
-                blackPixel.setColor(0,0,0,alpha <= 0 ? 0 : alpha);
+                counterTime -= 0.15f;
+            }else if (alpha > 0f){
+                alpha -= delta / 2;
+                if (alpha <= 0){
+                    manager.setScene(SceneManager.SceneType.MAINMENU);
+                }
             }
         }
         elapsedTime += delta;

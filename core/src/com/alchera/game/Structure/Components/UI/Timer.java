@@ -51,6 +51,10 @@ public class Timer extends BaseUIComponent {
         minutes = (current / (1000 * 60)) % 60;
     }
 
+    public void restart(){
+        this.startTime = System.currentTimeMillis();
+    }
+
     @Override
     public void setAlpha(float value) {
         Color clr = font.getColor();
