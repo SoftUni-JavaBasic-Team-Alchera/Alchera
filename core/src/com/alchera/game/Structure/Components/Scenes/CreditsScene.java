@@ -2,6 +2,8 @@ package com.alchera.game.Structure.Components.Scenes;
 
 import com.alchera.game.Alchera;
 import com.alchera.game.Structure.Managers.SceneManager;
+import com.alchera.game.Structure.Managers.SoundManager;
+import com.alchera.game.Structure.Utils.Variables;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
@@ -115,6 +117,7 @@ public class CreditsScene extends Scene {
     public void handleInput(){
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)){
             transitionExit = true;
+            SoundManager.getInstance().playSound(Variables.Sounds.MENUBACK);
         }
     }
 

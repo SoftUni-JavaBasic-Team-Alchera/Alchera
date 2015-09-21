@@ -1,5 +1,7 @@
 package com.alchera.game.Structure.Entities;
 
+import com.alchera.game.Structure.Managers.SoundManager;
+import com.alchera.game.Structure.Utils.Variables;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -58,6 +60,7 @@ public class Lock {
             sprite.setAlpha(alpha);
             if (alpha <= 0) {
                 this.toBeRemoved = true;
+                SoundManager.getInstance().playSound(Variables.Sounds.OPENDOOR);
             }
         }
     }
@@ -69,6 +72,8 @@ public class Lock {
         }
         return false;
     }
+
+    public boolean isLocked(){ return this.isLocked; }
 
     public boolean toBeRemoved(){
         return this.toBeRemoved;

@@ -3,6 +3,8 @@ package com.alchera.game.Structure.Components.Scenes;
 import com.alchera.game.Alchera;
 import com.alchera.game.Structure.Components.Camera.CustomCamera;
 import com.alchera.game.Structure.Managers.SceneManager;
+import com.alchera.game.Structure.Managers.SoundManager;
+import com.alchera.game.Structure.Utils.Variables;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
@@ -27,6 +29,7 @@ public class MainMenu extends Scene{
     private Texture weasel;
     private ShaderProgram shader;
     private OrthographicCamera localCamera;
+    private SoundManager soundManager;
     private float rotation;
     private float alpha;
     private float elapsedTime;
@@ -48,14 +51,17 @@ public class MainMenu extends Scene{
         parameter.borderWidth = 5;
         parameter.borderColor = Color.BLACK;
         parameter.size = 56;
+
         FreeTypeFontGenerator.FreeTypeFontParameter parameter2 = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter2.borderWidth = 5;
         parameter2.borderColor = Color.BLACK;
         parameter2.size = 36;
         titleFont = generator.generateFont(parameter);
         titleFont.setColor(Color.WHITE);
+
         font = generator2.generateFont(parameter2);
         font.setColor(Color.WHITE);
+
         menuItems= new String[]{
                 "PLAY",
                 "CREDITS",
@@ -63,11 +69,15 @@ public class MainMenu extends Scene{
         };
         weasel = new Texture("sprites/weasel.png");
         nextScene = -1;
+
         localCamera = new OrthographicCamera();
         localCamera.setToOrtho(false, Alchera.WIDTH,Alchera.HEIGHT);
         localCamera.zoom = 9f;
         localCamera.update();
+
         shader = batch.getShader();
+
+        soundManager = SoundManager.getInstance();
 
     }
 
@@ -118,6 +128,8 @@ public class MainMenu extends Scene{
 
         if (nextScene != -1){
             alpha = MathUtils.clamp(alpha - delta,0,1);
+            if (nextScene == 0)
+                soundManager.changeSongVolume(-delta);
             if (alpha <= 0){
                 batch.setProjectionMatrix(camera.combined);
                 changeGameState();
@@ -134,13 +146,20 @@ public class MainMenu extends Scene{
 
     public void handleInput(){
         if (Gdx.input.isKeyJustPressed(Input.Keys.W)){
-            if (currentItem>0) currentItem--;
+            if (currentItem>0) {
+                currentItem--;
+                soundManager.playSound(Variables.Sounds.MENUCHANGE);
+            }
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.S)){
-            if (currentItem<2) currentItem++;
+            if (currentItem<2){
+                currentItem++;
+                soundManager.playSound(Variables.Sounds.MENUCHANGE);
+            }
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)){
             nextScene = currentItem;
+            soundManager.playSound(Variables.Sounds.MENUSELECT);
         }
     }
 

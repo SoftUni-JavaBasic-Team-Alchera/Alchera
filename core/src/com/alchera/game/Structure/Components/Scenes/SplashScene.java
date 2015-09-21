@@ -2,6 +2,7 @@ package com.alchera.game.Structure.Components.Scenes;
 
 import com.alchera.game.Alchera;
 import com.alchera.game.Structure.Managers.SceneManager;
+import com.alchera.game.Structure.Managers.SoundManager;
 import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -40,7 +41,7 @@ public class SplashScene extends Scene {
         layoutPresents = new GlyphLayout(font,"");
         alpha = 0;
         shader = batch.getShader();
-
+        SoundManager.getInstance().playSongLooping("intro");
         shader.begin();
         shader.setUniformf("fade", alpha);
         shader.end();

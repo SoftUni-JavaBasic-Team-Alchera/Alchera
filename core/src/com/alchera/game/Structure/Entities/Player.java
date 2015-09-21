@@ -1,7 +1,9 @@
 package com.alchera.game.Structure.Entities;
 
+import com.alchera.game.Structure.Managers.SoundManager;
 import com.alchera.game.Structure.Utils.AssetUtils;
 import com.alchera.game.Structure.Utils.BodyFactory;
+import com.alchera.game.Structure.Utils.Variables;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.g2d.*;
@@ -25,16 +27,14 @@ public class Player implements Disposable{
     private int health = 3;
     //private float mana;
     private float elapsedTime;
+
     private boolean isIdle;
     private boolean isGrounded;
-
-
-    private boolean[] keys;
-
     private boolean isFlipped;
     private boolean isDying;
     private boolean isFinished;
     private boolean dead;
+    private boolean[] keys;
 
     private Sprite idle;
     private TextureAtlas atlas;
@@ -42,14 +42,13 @@ public class Player implements Disposable{
     private Animation jump;
     private Animation death;
     private Animation currentAnimation;
-
+    private SoundManager soundManager;
     public Player(World world){
         this(world,10,10);
     }
 
     public Player(World world, float x, float y){
         atlas = new TextureAtlas(Gdx.files.internal("sprites/player.txt"));
-        TextureAtlas.AtlasRegion region = atlas.findRegion("run0");
         idle = atlas.createSprite("run0");
         body = this.reCreate(world, x, y);
 
@@ -60,10 +59,11 @@ public class Player implements Disposable{
         death.setPlayMode(Animation.PlayMode.NORMAL);
         death.setFrameDuration(1f / 10f);
         jump = AssetUtils.createFromAtlas(atlas,"jump",5);
+        soundManager = SoundManager.getInstance();
     }
 
     public Body reCreate(World world,float x, float y) {
-        body = BodyFactory.CreateDynamicRectangle(world,idle.getRegionWidth(),idle.getRegionHeight(),x,y,0.2f,0);
+        body = BodyFactory.CreateDynamicRectangle(world,idle.getRegionWidth(),idle.getRegionHeight()-10,x,y,0.25f,0);
         body.setUserData(this);
 
         FixtureDef fdef = new FixtureDef();
@@ -119,6 +119,7 @@ public class Player implements Disposable{
         if (Gdx.input.isKeyJustPressed(Keys.SPACE)) {
             if (isGrounded){
                 body.applyForceToCenter(0, jumpForce * jumpMultiplier, true);
+                soundManager.playSound(Variables.Sounds.JUMP);
                 isGrounded = false;
             }
             if (currentAnimation != jump) {

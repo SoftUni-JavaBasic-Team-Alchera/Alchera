@@ -2,6 +2,8 @@ package com.alchera.game.Structure.Components.Scenes;
 
 import com.alchera.game.Alchera;
 import com.alchera.game.Structure.Managers.SceneManager;
+import com.alchera.game.Structure.Managers.SoundManager;
+import com.alchera.game.Structure.Utils.Variables;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
@@ -29,7 +31,9 @@ public class GameOver extends Scene{
     private Vector3 camPositionIn;
     private Vector3 camPositionOut;
     private ShaderProgram shader;
+    private SoundManager soundManager;
     private float alpha;
+    private float volumeFade;
     private boolean transitionExit;
 
     public GameOver(SceneManager sm) {
@@ -45,25 +49,35 @@ public class GameOver extends Scene{
         parameter.borderWidth = 5;
         parameter.borderColor = Color.BLACK;
         parameter.size = 56;
+
         FreeTypeFontGenerator.FreeTypeFontParameter parameter2 = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter2.borderWidth = 5;
         parameter2.borderColor = Color.BLACK;
         parameter2.size = 36;
+
         titleFont = generator.generateFont(parameter);
         titleFont.setColor(Color.WHITE);
+
         font = generator2.generateFont(parameter2);
         font.setColor(Color.WHITE);
+
         menuItems= new String[]{
                 "RESTART",
                 "CREDITS",
                 "EXIT"
         };
+
         weasel = new Texture("sprites/baboon.png");
+        volumeFade = 1;
+
         camPositionIn = camera.position.cpy();
-        camera.position.set(-Alchera.WIDTH / 2f, -Alchera.HEIGHT/2, camera.position.z);
+        camera.position.set(-Alchera.WIDTH / 2f, -Alchera.HEIGHT / 2, camera.position.z);
         camPositionOut = camera.position.cpy();
 
         shader = batch.getShader();
+
+        soundManager = SoundManager.getInstance();
+        soundManager.playSongLooping(Variables.Songs.GAMEOVER);
 
     }
 
@@ -97,12 +111,17 @@ public class GameOver extends Scene{
         }else{
             float x = MathUtils.lerp(camera.position.x,camPositionOut.x,0.1f);
             float y = MathUtils.lerp(camera.position.y,camPositionOut.y,0.1f);
-
+            volumeFade = MathUtils.lerp(volumeFade,0,0.03f);
+            if (currentItem == 0)
+                soundManager.setSongVolume(volumeFade);
             this.camera.position.set(x,y,camera.position.z);
             if (camPositionOut.epsilonEquals(camera.position, 0.01f)){
-                camera.position.set(camPositionIn);
+                if(currentItem != 2)
+                    camera.position.set(camPositionIn);
                 changeGameState();
             }
+            camera.update();
+            return;
         }
         camera.update();
         handleInput();
@@ -116,13 +135,20 @@ public class GameOver extends Scene{
 
     public void handleInput(){
         if (Gdx.input.isKeyJustPressed(Input.Keys.W)){
-            if (currentItem>0) currentItem--;
+            if (currentItem>0) {
+                currentItem--;
+                soundManager.playSound(Variables.Sounds.MENUCHANGE);
+            }
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.S)){
-            if (currentItem<2) currentItem++;
+            if (currentItem<2){
+                currentItem++;
+                soundManager.playSound(Variables.Sounds.MENUCHANGE);
+            }
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)){
             transitionExit = true;
+            soundManager.playSound(Variables.Sounds.MENUSELECT);
         }
     }
 

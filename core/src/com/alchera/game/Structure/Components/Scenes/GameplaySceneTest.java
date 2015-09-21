@@ -14,7 +14,9 @@ import com.alchera.game.Structure.Listeners.ContactHandler;
 import com.alchera.game.Structure.Managers.SceneManager;
 import static com.alchera.game.Structure.Utils.Variables.*;
 
+import com.alchera.game.Structure.Managers.SoundManager;
 import com.alchera.game.Structure.Utils.EnemyFactory;
+import com.alchera.game.Structure.Utils.Variables;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
@@ -53,6 +55,7 @@ public class GameplaySceneTest extends Scene {
     LinkedList<Lock> locks;
     ArrayList<BaseTrap> traps;
     ArrayList<Enemy> enemies;
+    SoundManager soundManager;
 
     Hud hud;
     World boxWorld;
@@ -67,6 +70,7 @@ public class GameplaySceneTest extends Scene {
     private boolean transitionIn;
     private boolean transitionOut;
     private float elapsedTime;
+    private boolean exitSpawned;
 
 
     public GameplaySceneTest(SceneManager sm){
@@ -78,7 +82,7 @@ public class GameplaySceneTest extends Scene {
         blurRadius = 0f;
         isBlurred = false;
         camLocked = true;
-
+        soundManager = SoundManager.getInstance();
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/bodoni.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 20;
@@ -128,10 +132,12 @@ public class GameplaySceneTest extends Scene {
         b2dcamera.isBox2DCamera(true);
         b2dcamera.setLimited(camLocked);
         b2dcamera.setMinPosition(new Vector2((Alchera.WIDTH * scale / 2f) / PPM, (Alchera.HEIGHT * scale / 2f) / PPM));
-        b2dcamera.setMaxPosition(new Vector2((level.size.x - (Alchera.WIDTH * scale / 2f))/PPM, (level.size.y - (Alchera.HEIGHT * scale / 2f))/PPM));
+        b2dcamera.setMaxPosition(new Vector2((level.size.x - (Alchera.WIDTH * scale / 2f)) / PPM, (level.size.y - (Alchera.HEIGHT * scale / 2f)) / PPM));
         b2dcamera.setPosition(new Vector3(player.getWorldX() / PPM, player.getWorldY() / PPM, 0));
         // Debug renderer to see a representation of what happens in the Box2D world.
         boxRenderer = new Box2DDebugRenderer();
+        soundManager.playSongLooping(Variables.Songs.GAMEPLAY,0);
+
     }
 
     @Override
@@ -218,6 +224,10 @@ public class GameplaySceneTest extends Scene {
         blur.setUniformf("dir", 0, 1);
         batch.draw(frameBufferB.getColorBufferTexture(), 0, 0);
         batch.end();
+
+        if (debug){
+            boxRenderer.render(boxWorld, b2dcamera.combined);
+        }
     }
 
     private void renderDebugInfo(){
@@ -247,50 +257,72 @@ public class GameplaySceneTest extends Scene {
 
     @Override
     public void update(float delta) {
-        elapsedTime += delta;
-        if (!transitionIn && elapsedTime > 1f){
-            fade = MathUtils.clamp(fade + delta/4,0,1);
-            blur.begin();
-            blur.setUniformf("fade",fade);
-            blur.end();
-            if (fade >= 1){
-                transitionIn = true;
-            }
-        }else if (transitionIn){
-            hud.getTimer().restart();
-        }
 
-        if (transitionOut){
-            fade = MathUtils.clamp(fade - delta/2,0,1);
-            blur.begin();
-            blur.setUniformf("fade",fade);
-            blur.end();
-            if (fade <= 0){
-                if (player.getHealth() <= 0){
-                    manager.setScene(SceneManager.SceneType.GAMEOVER);
-                    return;
-                }else if (player.isFinished()){
-                    manager.setScene(SceneManager.SceneType.YOUWIN);
-                    return;
-                }
-            }
-        }
-
-        if (player.getHealth() <= 0 || player.isFinished()){
-            transitionOut = true;
-            return;
-        }else if (player.isDead()){
-            reLoadLevel();
+        if (updateTransitions(delta)){
             return;
         }
 
-
-        shaderTests(delta);
+        updateElements(delta);
 
         // Move box2d world physics.
         boxWorld.step(1 / 60f, 8, 3);
         // Update player logic
         player.update(delta);
+
+        if (player.getHealth() <= 0 || player.isFinished()){
+            transitionOut = true;
+        }else if (player.getHealth() > 0 && player.isDead()){
+            reLoadLevel();
+            return;
+        }
+
+        // update both camera positions
+        camera.update();
+        b2dcamera.update();
+        batch.setProjectionMatrix(this.camera.combined);
+
+
+        handleInput(delta);
+
+    }
+
+    private boolean updateTransitions(float delta){
+        elapsedTime += delta;
+        if (!transitionIn && elapsedTime > 1f){
+            fade = MathUtils.clamp(fade + delta/4,0,1);
+            blur.begin();
+            blur.setUniformf("fade", fade);
+            blur.end();
+            soundManager.changeSongVolume(delta);
+            if (fade >= 1){
+                transitionIn = true;
+                hud.getTimer().restart();
+            }
+        }
+
+        if (transitionOut){
+            camera.update();
+            b2dcamera.update();
+            batch.setProjectionMatrix(this.camera.combined);
+            fade = MathUtils.clamp(fade - delta/2,0,1);
+            blur.begin();
+            blur.setUniformf("fade", fade);
+            blur.end();
+            soundManager.setSongVolume(fade);
+            if (fade <= 0){
+                if (player.getHealth() <= 0){
+                    manager.setScene(SceneManager.SceneType.GAMEOVER);
+                }else if (player.isFinished()){
+                    manager.setScene(SceneManager.SceneType.YOUWIN);
+                }
+            }
+
+            return true;
+        }
+        return false;
+    }
+
+    private void updateElements(float delta){
         for (Bonus bonus : bonuses){
             if (bonus.isActivated()){
                 if (!(bonus instanceof BonusHealth))
@@ -309,33 +341,35 @@ public class GameplaySceneTest extends Scene {
         for(Bonus bonus : toRemove){
             bonuses.remove(bonus);
         }
-        boolean unlocked = true;
+        int unlocked = 0;
         for(Lock lock : locks){
-            unlocked = lock.toBeRemoved();
             lock.update(delta);
+            if (!lock.isLocked())
+                unlocked++;
         }
-        if (unlocked){
-            level.spawnExit();
+        if (unlocked == locks.size()){
+            if (!exitSpawned){
+                level.spawnExit();
+                exitSpawned = true;
+                soundManager.playSound(Variables.Sounds.SUCCESS);
+            }
         }
         toRemove.clear();
 
         for (Enemy enemy : enemies){
             enemy.update(delta);
         }
-
-        // update both camera positions
-        camera.update();
-        b2dcamera.update();
-        batch.setProjectionMatrix(this.camera.combined);
         hud.update(delta);
+    }
 
+    private void handleInput(float delta){
+        shaderTests(delta);
         if (Gdx.input.isKeyJustPressed(Input.Keys.Z)){
             if (hud.isVisible())
                 hud.hide();
             else
                 hud.show();
         }
-
         if (Gdx.input.isKeyJustPressed(Input.Keys.R)){
             reLoadLevel();
         }else if (Gdx.input.isKeyJustPressed(Input.Keys.HOME)){
@@ -348,6 +382,7 @@ public class GameplaySceneTest extends Scene {
             b2dcamera.setLimited(camLocked);
         }
     }
+
 
     private void shaderTests(float delta){
         // Only for testing shaders atm.
@@ -394,6 +429,7 @@ public class GameplaySceneTest extends Scene {
     private void reLoadLevel(){
         if (boxWorld != null)
             boxWorld.dispose();
+        exitSpawned = false;
         boxWorld = new World(new Vector2(0,-18),false);
         level = new Level(batch,boxWorld);
         traps = level.getTraps();

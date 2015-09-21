@@ -2,6 +2,8 @@ package com.alchera.game.Structure.Components.Scenes;
 
 import com.alchera.game.Alchera;
 import com.alchera.game.Structure.Managers.SceneManager;
+import com.alchera.game.Structure.Managers.SoundManager;
+import com.alchera.game.Structure.Utils.Variables;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
@@ -31,6 +33,8 @@ public class YouWin extends Scene{
     private ShaderProgram shader;
     private float alpha;
     private boolean transitionExit;
+    private float volumeFade;
+    private SoundManager soundManager;
 
     public YouWin(SceneManager sm) {
         super(sm);
@@ -45,19 +49,24 @@ public class YouWin extends Scene{
         parameter.borderWidth = 5;
         parameter.borderColor = Color.BLACK;
         parameter.size = 56;
+
         FreeTypeFontGenerator.FreeTypeFontParameter parameter2 = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter2.borderWidth = 5;
         parameter2.borderColor = Color.BLACK;
         parameter2.size = 36;
+
         titleFont = generator.generateFont(parameter);
         titleFont.setColor(Color.WHITE);
+
         font = generator2.generateFont(parameter2);
         font.setColor(Color.WHITE);
+
         menuItems= new String[]{
                 "RESTART",
                 "CREDITS",
                 "EXIT"
         };
+
         weasel = new Texture("sprites/youwin.png");
 
         camPositionIn = camera.position.cpy();
@@ -65,6 +74,9 @@ public class YouWin extends Scene{
         camPositionOut = camera.position.cpy();
 
         shader = batch.getShader();
+
+        soundManager = SoundManager.getInstance();
+        soundManager.playSongLooping(Variables.Songs.INTRO);
 
     }
 
@@ -98,11 +110,16 @@ public class YouWin extends Scene{
         }else{
             float x = MathUtils.lerp(camera.position.x,camPositionOut.x,0.1f);
             float y = MathUtils.lerp(camera.position.y,camPositionOut.y,0.1f);
-
+            volumeFade = MathUtils.lerp(volumeFade,0,0.1f);
+            if (currentItem == 0)
+                soundManager.setSongVolume(volumeFade);
             this.camera.position.set(x,y,camera.position.z);
             if (camPositionOut.epsilonEquals(camera.position, 0.01f)){
+                camera.position.set(camPositionIn);
                 changeGameState();
             }
+            camera.update();
+            return;
         }
         camera.update();
         handleInput();
@@ -116,23 +133,28 @@ public class YouWin extends Scene{
 
     public void handleInput(){
         if (Gdx.input.isKeyJustPressed(Input.Keys.W)){
-            if (currentItem>0) currentItem--;
+            if (currentItem>0) {
+                currentItem--;
+                soundManager.playSound(Variables.Sounds.MENUCHANGE);
+            }
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.S)){
-            if (currentItem<2) currentItem++;
+            if (currentItem<2){
+                currentItem++;
+                soundManager.playSound(Variables.Sounds.MENUCHANGE);
+            }
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)){
             transitionExit = true;
+            soundManager.playSound(Variables.Sounds.MENUSELECT);
         }
     }
 
     private void changeGameState(){
         if (currentItem == 0){
             manager.setScene(SceneManager.SceneType.GAMEPLAY);
-            camera.position.set(camPositionIn);
         }if (currentItem == 1){
             manager.setScene(SceneManager.SceneType.CREDITS);
-            camera.position.set(camPositionIn);
         }if (currentItem ==2){
             Gdx.app.exit();
         }

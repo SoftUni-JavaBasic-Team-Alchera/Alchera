@@ -4,6 +4,8 @@ import com.alchera.game.Structure.Entities.Bonuses.Bonus;
 import com.alchera.game.Structure.Entities.Lock;
 import com.alchera.game.Structure.Entities.Player;
 import com.alchera.game.Structure.Entities.Traps.BaseTrap;
+import com.alchera.game.Structure.Managers.SoundManager;
+import com.alchera.game.Structure.Utils.Variables;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.physics.box2d.*;
 
@@ -42,16 +44,21 @@ public class ContactHandler implements ContactListener {
         if (player.getBody().getFixtureList().get(0) == a && isBonus(b)){
             Bonus bonus = (Bonus)b.getUserData();
             bonus.activate(player);
+
+            SoundManager.getInstance().playSound(Variables.Sounds.KEYPICKUP);
         }
         else if (player.getBody().getFixtureList().get(0) == a && (isTrap(b) || isDeadly(b))){
             if (player.isDying())
                 return;
             player.setHealth(player.getHealth()-1);
             player.setDying(true);
+            SoundManager.getInstance().playSound(Variables.Sounds.DIE);
         }
         else if (player.getBody().getFixtureList().get(0) == a && isLock(b)){
             Lock lock = (Lock)b.getUserData();
-            b.setSensor(lock.Unlock(player));
+            boolean hasKey = lock.Unlock(player);
+            b.setSensor(hasKey);
+
         }
         else if(isExit(b)){
             player.setFinished(true);

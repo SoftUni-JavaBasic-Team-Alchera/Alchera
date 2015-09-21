@@ -41,7 +41,6 @@ public class Level {
     private LinkedList<Lock> locks = new LinkedList<Lock>();
     private LinkedList<Bonus> bonuses = new LinkedList<Bonus>();
 
-
     public Level(SpriteBatch batch,World world){
         this.batch = batch;
         this.world = world;

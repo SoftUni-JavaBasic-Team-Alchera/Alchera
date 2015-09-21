@@ -1,6 +1,7 @@
 package com.alchera.game;
 
 import com.alchera.game.Structure.Managers.SceneManager;
+import com.alchera.game.Structure.Managers.SoundManager;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -15,11 +16,12 @@ public class Alchera extends ApplicationAdapter {
 	SpriteBatch batch;
 	OrthographicCamera camera;
     SceneManager sceneManager;
+	SoundManager soundManager;
 
 	@Override
 	public void create () {
 
-
+		soundManager = SoundManager.getInstance();
 
 		// Camera for the game world
 		camera = new OrthographicCamera();
